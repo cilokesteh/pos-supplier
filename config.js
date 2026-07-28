@@ -6,16 +6,16 @@
 
 // --- Store identity ---
 const STORE = {
-  name:    'Supplier Hub',
-  address: 'Jl. Gudang No. 1, Kawasan Industri',
-  phone:   '0812-0000-0000',
+  name:    'ANSTORE',
+  address: 'Perumahan Bumi Banget Ayu Raya B17, Banget Ayu Kulon, Semarang Jawa Tengah',
+  phone:   '089501407229',
   hours:   'Senin - Sabtu: 08.00 - 17.00',
-  wa:      '0812-0000-0000',
-  instagram: '@supplierhub',
-  facebook:  'Supplier Hub Official',
-  tiktok:    '@supplierhub',
-  website:   'www.supplierhub.com',
-  footer:  'Supplier Hub — Manajemen Pembelian & Supplier'
+  wa:      '089501407229',
+  instagram: '@anstore',
+  facebook:  'ANSTORE Official',
+  tiktok:    '@anstore',
+  website:   'www.anstore.id',
+  footer:  'Terima kasih atas kerjasamanya'
 };
 
 // --- Theme ---

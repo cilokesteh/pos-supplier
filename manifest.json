@@ -1,7 +1,7 @@
 {
-  "name": "Supplier Hub",
-  "short_name": "SupplierHub",
-  "description": "Manajemen Pembelian, PO, Penerimaan, Pembayaran Supplier",
+  "name": "ANSTORE",
+  "short_name": "ANSTORE",
+  "description": "ANSTORE — Manajemen Pembelian, PO, Penerimaan, Pembayaran",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0a0b",

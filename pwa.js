@@ -2,9 +2,9 @@
 (function() {
   if (typeof STORE === 'undefined') return;
   const manifest = {
-    name: STORE.name + ' — Pembelian & Supplier',
-    short_name: 'SupplierHub',
-    description: 'Supplier Hub — Manajemen Pembelian, PO, Penerimaan, Pembayaran.',
+    name: STORE.name + ' — Supplier & Pembelian',
+    short_name: 'ANSTORE',
+    description: 'ANSTORE — Manajemen Pembelian, PO, Penerimaan, Pembayaran.',
     start_url: './index.html',
     display: 'standalone',
     orientation: 'any',
