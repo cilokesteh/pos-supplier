@@ -7,7 +7,7 @@
 // --- Store identity ---
 const STORE = {
   name:    'ANSTORE',
-  address: 'Perumahan Bumi Banget Ayu Raya B17, Banget Ayu Kulon, Semarang Jawa Tengah',
+  address: 'Jl. Widuri III No.B17, Bangetayu Kulon, Kec. Genuk, Kota Semarang, Jawa Tengah 50115',
   phone:   '089501407229',
   hours:   'Senin - Sabtu: 08.00 - 17.00',
   wa:      '089501407229',
