@@ -612,101 +612,8 @@ ${items.length===0?'<tr><td colspan="5" style="text-align:center;padding:15px;co
     <div class="sign-col"><div class="sign-line">Penanggung Jawab</div></div>
   </div>
 </div>
-</div></body></html>`;
-</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:12px;color:#1a1a1a;background:#fff;padding:0}
-.nota{width:80mm;margin:0 auto;padding:5mm 4mm}
-@media print{.nota{width:80mm;padding:2mm 3mm}.no-print{display:none!important}body{-webkit-print-color-adjust:exact}}
-@page{size:80mm auto;margin:2mm}
-.header{text-align:center;padding-bottom:6px;margin-bottom:6px;border-bottom:3px double #000}
-.store-name{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.store-sub{font-size:9px;color:#555;margin-top:2px;letter-spacing:0.5px}
-.store-contact{font-size:9px;color:#444;margin-top:1px}
-.title-bar{text-align:center;margin:6px 0;padding:4px;background:#f0f0f0;border:1px solid #ccc;font-weight:700;font-size:13px;letter-spacing:1px}
-.info-grid{display:flex;justify-content:space-between;margin:6px 0;font-size:10px;line-height:1.6}
-.info-col{flex:1}.info-col.right{text-align:right}
-.info-label{color:#666;font-size:9px}.info-val{font-weight:600}
-.item-table{width:100%;border-collapse:collapse;margin:6px 0;font-size:10px}
-.item-table thead{background:#f5f5f5}
-.item-table th{padding:4px 3px;border-top:1.5px solid #000;border-bottom:1px solid #000;text-align:left;font-weight:700;font-size:9px;text-transform:uppercase;color:#333}
-.item-table td{padding:4px 3px;border-bottom:1px solid #e0e0e0}
-.item-table th.num,.item-table td.num{text-align:center;width:22px}
-.item-table th.qty,.item-table td.qty{text-align:center;width:30px}
-.item-table th.price,.item-table td.price{text-align:right;width:72px}
-.item-table th.total,.item-table td.total{text-align:right;width:80px}
-.item-table tbody tr:last-child td{border-bottom:1.5px solid #000}
-.totals-box{margin-top:4px}
-.totals-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}
-.totals-row.sub{border-top:1px solid #999;padding-top:3px;margin-top:2px}
-.totals-row.grand{font-size:13px;font-weight:800;border-top:2px solid #000;padding-top:4px;margin-top:3px}
-.pay-box{border:1px dashed #999;padding:5px 6px;margin:8px 0;font-size:10px;background:#fafafa}
-.pay-row{display:flex;justify-content:space-between;padding:1px 0}
-.pay-row.due{font-weight:700;margin-top:2px;padding-top:2px;border-top:1px dotted #ccc}
-.notes{font-size:9px;color:#555;margin:6px 0;padding:4px;background:#f9f9f9;border-left:2px solid #ccc}
-.footer-line{border-top:2px dashed #000;margin-top:8px;padding-top:5px}
-.footer{text-align:center;font-size:9px;color:#555}
-.footer .thanks{font-size:11px;font-weight:600;color:#1a1a1a;margin-bottom:2px}
-.footer .copy{font-size:8px;color:#999;margin-top:3px}
-.sign-row{display:flex;justify-content:space-between;margin-top:22px;font-size:9px}
-.sign-col{width:45%;text-align:center}
-.sign-line{border-top:1px solid #000;margin-top:35px;padding-top:3px}
-.bar-print{margin:10px 0;text-align:center}
-.bar-print button{padding:8px 20px;font-size:13px;border:1px solid #000;background:#fff;cursor:pointer;margin:0 5px;border-radius:4px}
-.bar-print button:hover{background:#f0f0f0}
-@media(max-width:600px){.nota{width:100%;padding:8px}}
-</style></head><body>
-<div class="nota">
-<div class="bar-print no-print"><button onclick="window.print()">🖨️ Cetak Nota</button><button onclick="window.close()">✕ Tutup</button></div>
-<div class="header">
-  <div class="store-name">${esc(STORE.name)}</div>
-  <div class="store-sub">${esc(STORE.address)}</div>
-  <div class="store-contact">Telp/WA: ${esc(STORE.phone)}</div>
-</div>
-<div class="title-bar">NOTA PEMBELIAN</div>
-<div class="info-grid">
-  <div class="info-col">
-    <div><span class="info-label">No. PO</span></div>
-    <div class="info-val">${esc(po.poNumber)}</div>
-    <div><span class="info-label">Tanggal</span></div>
-    <div>${tgl}</div>
-  </div>
-  <div class="info-col right">
-    <div><span class="info-label">Kepada</span></div>
-    <div class="info-val">${esc(supplier)}</div>
-    <div><span class="info-label">Status</span></div>
-    <div>${esc(po.status.toUpperCase())}</div>
-  </div>
-</div>
-<table class="item-table">
-<thead><tr><th class="num">No</th><th class="qty">Qty</th><th>Nama Barang</th><th class="price">Harga</th><th class="total">Total</th></tr></thead>
-<tbody>
-${items.map((it,i)=>`<tr><td class="num">${i+1}</td><td class="qty">${it.qty}</td><td>${esc(it.description||'—')}</td><td class="price">${formatRp(it.costPrice)}</td><td class="total">${formatRp(it.qty*it.costPrice)}</td></tr>`).join('')}
-${items.length===0?'<tr><td colspan="5" style="text-align:center;padding:8px">— Tidak ada item —</td></tr>':''}
-</tbody>
-</table>
-<div class="totals-box">
-  <div class="totals-row sub"><span>Subtotal</span><span>${formatRp(subtotal)}</span></div>
-  <div class="totals-row grand"><span>TOTAL</span><span>${formatRp(subtotal)}</span></div>
-</div>
-<div class="pay-box">
-  <div class="pay-row"><span>Terbayar</span><span>${formatRp(paid)}</span></div>
-  <div class="pay-row due" style="color:${remaining>0?'#c00':'#080'}"><span>Sisa Bayar</span><span>${formatRp(remaining)}</span></div>
-</div>
-${po.notes?`<div class="notes"><b>Catatan:</b> ${esc(po.notes)}</div>`:''}
-<div class="footer-line"></div>
-<div class="footer">
-  <div class="thanks">Terima kasih atas kerjasamanya 🙏</div>
-  <div class="copy">${esc(STORE.name)} &copy; ${new Date().getFullYear()}</div>
-</div>
-<div class="sign-row">
-  <div class="sign-col"><div class="sign-line">Penerima</div></div>
-  <div class="sign-col"><div class="sign-line">Penanggung Jawab</div></div>
-</div>
-</div></body></html>`;
 }
-
+</div></body></html>`;
 function printPO(id){
   const po=allPOs.find(p=>p.id===id);if(!po){showToast('PO tidak ditemukan');return}
   const html=buildNotaHTML(po);
@@ -827,7 +734,7 @@ function searchStock(){
   const matches=allStockMoves.filter(m=>(m.description||'').toLowerCase().includes(q)||(m.poNumber||'').toLowerCase().includes(q)||(m.supplierName||'').toLowerCase().includes(q));
   const el=document.getElementById('receive-result');
   if(matches.length>0){
-    el.innerHTML=`<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800"><h4 class="font-semibold text-emerald-400 mb-2">Ditemukan ${matches.length} record</h4>${matches.slice(0,10).map(m=>`<div class="py-2 border-b border-zinc-800 last:border-0 text-sm"><span class="font-medium">${esc(m.description)}</span> <span class="text-zinc-500">x${m.qty}</span> <span class="text-zinc-400">${formatRp(m.costPrice)}</span> <span class="text-xs text-zinc-600">PO: ${esc(m.poNumber||'—')}</span></div>`).join('')}</div>`;
+    var h='<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800"><h4 class="font-semibold text-emerald-400 mb-2">Ditemukan '+matches.length+' record</h4>';matches.slice(0,10).forEach(function(m){h+='<div class="py-2 border-b border-zinc-800 last:border-0 text-sm"><span class="font-medium">'+esc(m.description)+'</span> <span class="text-zinc-500">x'+m.qty+'</span> <span class="text-zinc-400">'+formatRp(m.costPrice)+'</span> <span class="text-xs text-zinc-600">PO: '+esc(m.poNumber||'—')+'</span></div>'});h+='</div>';el.innerHTML=h;
   } else {
     el.innerHTML=`<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800"><h4 class="font-semibold text-yellow-400">Tidak ditemukan</h4><p class="text-sm text-zinc-400 mt-1">Barang belum ada di sistem. Tambah via PO → Terima Barang.</p></div>`;
   }
@@ -882,7 +789,7 @@ function renderPaymentTable(){
 
   const outstanding={};allPOs.forEach(p=>{const rem=Math.max(0,(p.totalAmount||0)-(p.paidAmount||0));if(rem>0){if(!outstanding[p.supplierName])outstanding[p.supplierName]={total:0,cnt:0};outstanding[p.supplierName].total+=rem;outstanding[p.supplierName].cnt++}});
   const entries=Object.entries(outstanding);
-  document.getElementById('outstanding-list').innerHTML=entries.length>0?`<h4 class="font-semibold mb-2">Hutang Tertunggak</h4>${entries.map(([n,d])=>`<div class="flex items-center justify-between py-3 px-4 bg-zinc-900 rounded-xl border border-zinc-800 mb-2"><div><span class="font-medium">${esc(n)}</span><span class="text-xs text-zinc-500 ml-2">${d.cnt} PO</span></div><span class="text-yellow-400 font-bold tabular">${formatRp(d.total)}</span></div>`).join('')}`:'<p class="text-zinc-600 text-sm mb-4">✓ Tidak ada hutang</p>';
+  document.getElementById('outstanding-list').innerHTML=entries.length>0?`<h4 class="font-semibold mb-2">Hutang Tertunggak</h4>${(function(){var h='';entries.forEach(function(e){h+='<div class="flex items-center justify-between py-3 px-4 bg-zinc-900 rounded-xl border border-zinc-800 mb-2"><div><span class="font-medium">'+esc(e[0])+'</span><span class="text-xs text-zinc-500 ml-2">'+e[1].cnt+' PO</span></div><span class="text-yellow-400 font-bold tabular">'+formatRp(e[1].total)+'</span></div>'});return h})()}`:'<p class="text-zinc-600 text-sm mb-4">✓ Tidak ada hutang</p>';
 }
 
 function showPayModal(){
@@ -954,7 +861,7 @@ function generateReport(){
       <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Dibayar</div><div class="text-xl font-bold text-emerald-400">${formatRp(paid)}</div></div>
     </div>
     <h4 class="font-semibold mb-2">Per Supplier</h4>
-    <div class="table-wrap"><table class="w-full text-sm"><thead><tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Supplier</th><th class="pb-2">Total</th></tr></thead><tbody>${Object.entries(sb).sort((a,b)=>b[1]-a[1]).map(([n,t])=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${esc(n)}</td><td class="tabular font-medium">${formatRp(t)}</td></tr>`).join('')}</tbody></table></div>`;
+    <div class="table-wrap"><table class="w-full text-sm"><thead><tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Supplier</th><th class="pb-2">Total</th></tr></thead><tbody>${(function(){var h='';Object.entries(sb).sort((a,b)=>b[1]-a[1]).forEach(function(r){h+='<tr class="border-b border-zinc-800/50"><td class="py-2">'+esc(r[0])+'</td><td class="tabular font-medium">'+formatRp(r[1])+'</td></tr>'});return h})()}</tbody></table></div>`;
 }
 
 // ============================================================
