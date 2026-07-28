@@ -427,7 +427,7 @@ function renderPOTable(){
   if(!allPOs.length){tb.innerHTML='<tr><td colspan="7" class="py-4 text-center text-zinc-600">Belum ada PO</td></tr>';return}
   tb.innerHTML=allPOs.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>{
     const rem=Math.max(0,(p.totalAmount||0)-(p.paidAmount||0));
-    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(p.poNumber)}</td><td class="py-3 text-zinc-400">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${p.items?p.items.length+' item':'—'}</td><td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${rem>0?'text-yellow-400':'text-emerald-400'}">${rem>0?'Sisa: '+formatRp(rem):'Lunas'}</span></td><td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td><td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td><td class="py-3">${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300 mr-2">Kirim</button>`:''}${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-emerald-400 hover:text-emerald-300 mr-2">Diterima</button>`:''}<button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`;
+    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(p.poNumber)}</td><td class="py-3 text-zinc-400">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${p.items?p.items.length+' item':'—'}</td><td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${rem>0?'text-yellow-400':'text-emerald-400'}">${rem>0?'Sisa: '+formatRp(rem):'Lunas'}</span></td><td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td><td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td><td class="py-3 flex flex-wrap gap-1"><button onclick="printPO('${p.id}')" class="text-xs text-emerald-400 hover:text-emerald-300">Cetak</button>${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300">Kirim</button>`:''}${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-blue-400 hover:text-blue-300">Diterima</button>`:''}<button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`;
   }).join('');
 }
 
@@ -461,6 +461,157 @@ function savePO(){
 
 function updatePOStatus(id,status){if(!confirm('Ubah status?'))return;const i=allPOs.findIndex(x=>x.id===id);if(i<0)return;allPOs[i].status=status;storeSet('pos',allPOs);showToast('Status diupdate');renderPOTable();renderDashboard()}
 function deletePO(id){if(!confirm('Hapus PO?'))return;allPOs=allPOs.filter(x=>x.id!==id);storeSet('pos',allPOs);showToast('Dihapus');renderPOTable();renderDashboard()}
+// ============================================================
+// NOTA / RECEIPT
+// ============================================================
+function buildNotaHTML(po){
+  const supplier=po.supplierName||'—';
+  const items=po.items||[];
+  const subtotal=po.totalAmount||items.reduce((a,it)=>a+it.qty*it.costPrice,0);
+  const paid=po.paidAmount||0;
+  const remaining=Math.max(0,subtotal-paid);
+  const d=new Date(po.createdAt);
+  const tgl=d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  const time=d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+
+  return`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Nota ${esc(po.poNumber)}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;font-size:12px;color:#000;background:#fff;padding:0}
+.nota{width:80mm;margin:0 auto;padding:5mm}
+@media print{.nota{width:80mm;padding:3mm}.no-print{display:none!important}}
+.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:5px;margin-bottom:5px}
+.store-name{font-size:16px;font-weight:bold;letter-spacing:1px}
+.store-addr{font-size:10px;margin-top:2px}
+.title{text-align:center;font-size:14px;font-weight:bold;margin:8px 0;border:1px solid #000;padding:3px}
+.info{display:flex;justify-content:space-between;margin:5px 0;font-size:11px}
+.info-left{flex:1}.info-right{flex:1;text-align:right}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}
+th{border-top:1px solid #000;border-bottom:1px solid #000;padding:3px 2px;text-align:left;font-weight:bold}
+th:last-child,td:last-child{text-align:right}
+th:nth-child(2),td:nth-child(2){text-align:center;width:35px}
+th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){text-align:right;width:70px}
+td{padding:3px 2px;border-bottom:1px dotted #ccc}
+.totals{border-top:2px solid #000;margin-top:5px;padding-top:5px}
+.total-row{display:flex;justify-content:space-between;font-size:11px;margin:2px 0}
+.total-row.grand{font-size:14px;font-weight:bold;border-top:1px solid #000;padding-top:3px;margin-top:3px}
+.payment-info{border:1px dashed #000;padding:5px;margin:8px 0;font-size:11px}
+.footer{text-align:center;font-size:10px;margin-top:8px;border-top:2px dashed #000;padding-top:5px}
+.stamp{display:flex;justify-content:space-between;margin-top:20px;font-size:10px}
+.stamp-box{width:45%;text-align:center;border-top:1px solid #000;padding-top:3px}
+.bar-print{margin:10px 0;text-align:center}
+.bar-print button{padding:8px 20px;font-size:13px;border:1px solid #000;background:#fff;cursor:pointer;margin:0 5px}
+.bar-print button:hover{background:#f0f0f0}
+@media(max-width:600px){.nota{width:100%;padding:10px}}
+</style></head><body>
+<div class="nota">
+<div class="bar-print no-print"><button onclick="window.print()">🖨️ Cetak Nota</button><button onclick="window.close()">✕ Tutup</button></div>
+<div class="header">
+  <div class="store-name">${esc(STORE.name)}</div>
+  <div class="store-addr">${esc(STORE.address)}</div>
+  <div class="store-addr">Telp: ${esc(STORE.phone)} | WA: ${esc(STORE.wa)}</div>
+</div>
+<div class="title">NOTA PEMBELIAN</div>
+<div class="info">
+  <div class="info-left">
+    <div>No. PO: <b>${esc(po.poNumber)}</b></div>
+    <div>Tanggal: ${tgl}</div>
+    <div>Jam: ${time}</div>
+  </div>
+  <div class="info-right">
+    <div>Kepada Yth:</div>
+    <div><b>${esc(supplier)}</b></div>
+    <div>Status: ${esc(po.status.toUpperCase())}</div>
+  </div>
+</div>
+<table>
+<thead><tr><th>NO</th><th>QTY</th><th>DESKRIPSI BARANG</th><th>HARGA</th><th>TOTAL</th></tr></thead>
+<tbody>
+${items.map((it,i)=>`<tr><td>${i+1}</td><td>${it.qty}</td><td>${esc(it.description||'—')}</td><td>${formatRp(it.costPrice)}</td><td>${formatRp(it.qty*it.costPrice)}</td></tr>`).join('')}
+${items.length===0?'<tr><td colspan="5" style="text-align:center">— Tidak ada item —</td></tr>':''}
+</tbody>
+</table>
+<div class="totals">
+  <div class="total-row"><span>Subtotal</span><span>${formatRp(subtotal)}</span></div>
+  <div class="total-row grand"><span>TOTAL PEMBELIAN</span><span>${formatRp(subtotal)}</span></div>
+</div>
+<div class="payment-info">
+  <div class="total-row"><span>Dibayar</span><span>${formatRp(paid)}</span></div>
+  <div class="total-row" style="font-weight:bold;color:${remaining>0?'#c00':'#080'}"><span>Sisa Pembayaran</span><span>${formatRp(remaining)}</span></div>
+</div>
+${po.notes?`<div style="font-size:10px;margin:5px 0"><b>Catatan:</b> ${esc(po.notes)}</div>`:''}
+<div class="footer">
+  <div>${esc(STORE.footer||'Terima kasih atas kerjasamanya')}</div>
+  <div style="margin-top:3px">${esc(STORE.name)} &copy; ${new Date().getFullYear()}</div>
+</div>
+<div class="stamp">
+  <div class="stamp-box">Penerima</div>
+  <div class="stamp-box">Penanggung Jawab</div>
+</div>
+</div></body></html>`;
+}
+
+function printPO(id){
+  const po=allPOs.find(p=>p.id===id);if(!po){showToast('PO tidak ditemukan');return}
+  const html=buildNotaHTML(po);
+  const w=window.open('','_blank','width=400,height=700');
+  w.document.write(html);w.document.close();
+}
+
+function downloadNotaPDF(id){
+  const po=allPOs.find(p=>p.id===id);if(!po){showToast('PO tidak ditemukan');return}
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF('p','mm',[80,200]);
+  const items=po.items||[];
+  const subtotal=po.totalAmount||0;
+  const paid=po.paidAmount||0;
+  const remaining=Math.max(0,subtotal-paid);
+  let y=8;
+  // Header
+  doc.setFontSize(14);doc.setFont(undefined,'bold');doc.text(STORE.name,40,y,{align:'center'});y+=5;
+  doc.setFontSize(8);doc.setFont(undefined,'normal');doc.text(STORE.address,40,y,{align:'center'});y+=4;
+  doc.text('Telp: '+STORE.phone+' | WA: '+STORE.wa,40,y,{align:'center'});y+=5;
+  doc.setDrawColor(0);doc.setLineDashPattern([2,2],0);doc.line(5,y,75,y);y+=5;
+  // Title
+  doc.setFontSize(11);doc.setFont(undefined,'bold');doc.text('NOTA PEMBELIAN',40,y,{align:'center'});y+=7;
+  // Info
+  doc.setFontSize(8);doc.setFont(undefined,'normal');
+  doc.text('No. PO: '+po.poNumber,5,y);doc.text('Tanggal: '+formatDate(po.createdAt),55,y);y+=4;
+  doc.text('Kepada: '+(po.supplierName||'—'),5,y);doc.text('Status: '+po.status.toUpperCase(),55,y);y+=6;
+  // Table header
+  doc.setFont(undefined,'bold');doc.line(5,y,75,y);y+=4;
+  doc.text('NO',5,y);doc.text('QTY',12,y);doc.text('DESKRIPSI',20,y);doc.text('HARGA',50,y,{align:'right'});doc.text('TOTAL',73,y,{align:'right'});y+=4;
+  doc.line(5,y,75,y);y+=3;
+  // Items
+  doc.setFont(undefined,'normal');
+  items.forEach((it,i)=>{
+    doc.text(String(i+1),5,y);doc.text(String(it.qty),14,y);
+    const desc=it.description||'—';doc.text(desc.substring(0,25),20,y);
+    doc.text(formatRp(it.costPrice),50,y,{align:'right'});
+    doc.text(formatRp(it.qty*it.costPrice),73,y,{align:'right'});
+    y+=4;
+  });
+  if(items.length===0){doc.text('— Tidak ada item —',40,y,{align:'center'});y+=4}
+  y+=2;doc.line(5,y,75,y);y+=5;
+  // Totals
+  doc.setFont(undefined,'bold');
+  doc.text('Subtotal:',20,y);doc.text(formatRp(subtotal),73,y,{align:'right'});y+=5;
+  doc.setFontSize(10);doc.text('TOTAL:',20,y);doc.text(formatRp(subtotal),73,y,{align:'right'});y+=7;
+  // Payment
+  doc.setFontSize(8);doc.setFont(undefined,'normal');
+  doc.text('Dibayar:',20,y);doc.text(formatRp(paid),73,y,{align:'right'});y+=5;
+  doc.setFont(undefined,'bold');doc.text('Sisa:',20,y);doc.text(formatRp(remaining),73,y,{align:'right'});y+=7;
+  // Footer
+  doc.setLineDashPattern([2,2],0);doc.line(5,y,75,y);y+=5;
+  doc.setFontSize(7);doc.setFont(undefined,'normal');
+  doc.text(STORE.footer||'Terima kasih',40,y,{align:'center'});y+=4;
+  doc.text(STORE.name+' © '+new Date().getFullYear(),40,y,{align:'center'});y+=10;
+  // Signatures
+  doc.line(5,y,30,y);doc.line(50,y,75,y);y+=4;
+  doc.text('Penerima',17,y,{align:'center'});doc.text('Penanggung Jawab',62,y,{align:'center'});
+  doc.save('Nota-'+po.poNumber+'.pdf');
+}
+
 
 // ============================================================
 // RECEIVING
