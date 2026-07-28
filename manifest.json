@@ -1,6 +1,6 @@
 {
-  "name": "Toko HP",
-  "short_name": "TokoHP",
+  "name": "ANSTORE",
+  "short_name": "ANSTORE",
   "description": "Manajemen Pembelian, PO, Penerimaan, Pembayaran",
   "start_url": "./index.html",
   "display": "standalone",

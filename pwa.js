@@ -3,7 +3,7 @@
   if (typeof STORE === 'undefined') return;
   const manifest = {
     name: STORE.name + ' — Supplier & Pembelian',
-    short_name: 'TokoHP',
+    short_name: 'ANSTORE',
     description: 'Manajemen Pembelian, PO, Penerimaan, Pembayaran Supplier.',
     start_url: './index.html',
     display: 'standalone',
