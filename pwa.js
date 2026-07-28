@@ -1,11 +1,10 @@
 // pwa.js — register service worker + dynamic manifest
 (function() {
   if (typeof STORE === 'undefined') return;
-
   const manifest = {
-    name: STORE.name,
-    short_name: 'Supplier',
-    description: 'Supplier Hub — Purchase Orders, Supplier Management, Goods Receiving',
+    name: STORE.name + ' — Pembelian & Supplier',
+    short_name: 'SupplierHub',
+    description: 'Supplier Hub — Manajemen Pembelian, PO, Penerimaan, Pembayaran.',
     start_url: './index.html',
     display: 'standalone',
     orientation: 'any',
@@ -18,10 +17,9 @@
   link.rel = 'manifest';
   link.href = URL.createObjectURL(blob);
   document.head.appendChild(link);
-
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('sw.js?v=9').catch(function(e) {
+      navigator.serviceWorker.register('sw.js?v=1').catch(function(e) {
         console.warn('SW register failed:', e);
       });
     });

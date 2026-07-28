@@ -1,5 +1,4 @@
 <!-- Copyright © 2026 CilokTech (ciloktech.my.id) | Proprietary Software | Unauthorized copying/distribution prohibited | License: Commercial - Contact ciloktech.my.id -->
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,92 +8,50 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="pragma" content="no-cache">
 <title>Supplier Hub</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="config.js"></script>
 <script src="pwa.js"></script>
 <style>
-  body{background:#0a0a0b}
-  .view{display:none}
-  .view.active{display:block}
-  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  #app{height:100dvh}
-  #content{-webkit-overflow-scrolling:touch}
-  input,select,textarea{font-size:16px}
-  #sidebar{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-  header{padding-top:env(safe-area-inset-top)}
-  #sidebar-toggle{display:none}
-  #sidebar-backdrop{display:none}
-  @media(max-width:768px){
-    #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .25s ease;width:240px}
-    #sidebar.open{transform:translateX(0)}
-    #sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
-    #sidebar-backdrop.show{display:block}
-    #sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px}
-    #content{padding:1rem}
-    .grid-cols-3{grid-template-columns:repeat(2,1fr)!important}
-    .modal-box{width:calc(100vw - 2rem)!important;max-width:none!important}
-    button,.nav-btn{min-height:44px}
-    .nav-btn{padding:12px 16px}
-  }
-  #ptr-indicator{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);padding:8px 16px;background:rgba(24,24,27,.95);border-radius:0 0 12px 12px;font-size:13px;color:#10b981;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.3);border:1px solid rgba(16,185,129,.2);border-top:none}
-  #ptr-indicator.show{display:block}
-  .tabular{font-variant-numeric:tabular-nums}
-  .badge{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
-  .badge-draft{background:#1e3a5f;color:#60a5fa}
-  .badge-sent{background:#713f12;color:#facc15}
-  .badge-received{background:#14532d;color:#4ade80}
-  .badge-paid{background:#14532d;color:#4ade80}
-  .badge-unpaid{background:#7f1d1d;color:#fca5a5}
-  .badge-partial{background:#713f12;color:#facc15}
+body{background:#0a0a0b}.view{display:none}.view.active{display:block}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#app{height:100dvh}#content{-webkit-overflow-scrolling:touch}
+input,select,textarea{font-size:16px}
+#sidebar{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+header{padding-top:env(safe-area-inset-top)}
+#sidebar-toggle{display:none}#sidebar-backdrop{display:none}
+@media(max-width:768px){
+  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .25s ease;width:240px}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+  #sidebar-backdrop.show{display:block}
+  #sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px}
+  #content{padding:1rem}
+  .grid-cols-3{grid-template-columns:repeat(2,1fr)!important}
+  .modal-box{width:calc(100vw - 2rem)!important;max-width:none!important}
+  button,.nav-btn{min-height:44px}.nav-btn{padding:12px 16px}
+}
+#ptr-indicator{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);padding:8px 16px;background:rgba(24,24,27,.95);border-radius:0 0 12px 12px;font-size:13px;color:#10b981;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.3);border:1px solid rgba(16,185,129,.2);border-top:none}
+#ptr-indicator.show{display:block}
+.tabular{font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
+.badge-draft{background:#1e3a5f;color:#60a5fa}.badge-sent{background:#713f12;color:#facc15}
+.badge-received{background:#14532d;color:#4ade80}.badge-paid{background:#14532d;color:#4ade80}
+.badge-unpaid{background:#7f1d1d;color:#fca5a5}.badge-partial{background:#713f12;color:#facc15}
 </style>
 </head>
 <body class="text-zinc-100 overflow-hidden">
-
-<div id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <div id="ptr-indicator">Tarik untuk refresh</div>
 
-<!-- ===== LOGIN ===== -->
-<div id="login-page" class="flex items-center justify-center h-screen">
-  <div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800 w-full max-w-sm mx-4">
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-      </div>
-      <h1 class="text-xl font-bold">Supplier Hub</h1>
-      <p class="text-sm text-zinc-500 mt-1">Masuk ke akun Anda</p>
-    </div>
-    <div class="space-y-3">
-      <input id="login-email" type="email" placeholder="Email" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-      <input id="login-pass" type="password" placeholder="Password" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" onkeydown="if(event.key==='Enter')doLogin()">
-      <button onclick="doLogin()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white transition">Masuk</button>
-    </div>
-    <p id="login-error" class="text-red-400 text-sm text-center mt-3 hidden"></p>
-  </div>
-</div>
-
-<!-- ===== APP ===== -->
-<div id="app" class="flex h-screen hidden">
-  <!-- Sidebar backdrop -->
+<div id="app" class="flex h-screen">
   <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
-
-  <!-- Sidebar -->
   <aside id="sidebar" class="w-60 bg-zinc-950 border-r border-zinc-900 flex flex-col shrink-0">
-    <div class="p-4 border-b border-zinc-900 flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-bold" id="sb-store">Supplier Hub</h1>
-        <p class="text-xs text-zinc-500">Pembelian & Supplier</p>
-      </div>
-      <button onclick="closeSidebar()" class="md:hidden text-zinc-400 hover:text-white p-1">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
+    <div class="p-4 border-b border-zinc-900">
+      <h1 class="text-lg font-bold">Supplier Hub</h1>
+      <p class="text-xs text-zinc-500">Pembelian & Supplier</p>
     </div>
     <nav class="flex-1 py-2" id="nav-menu">
       <button data-view="dashboard" class="nav-btn active w-full text-left px-4 py-3 text-sm hover:bg-zinc-900 flex items-center gap-3 transition">
@@ -102,7 +59,7 @@
         Dashboard
       </button>
       <button data-view="suppliers" class="nav-btn w-full text-left px-4 py-3 text-sm hover:bg-zinc-900 flex items-center gap-3 transition text-zinc-400">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Supplier
       </button>
       <button data-view="po" class="nav-btn w-full text-left px-4 py-3 text-sm hover:bg-zinc-900 flex items-center gap-3 transition text-zinc-400">
@@ -127,17 +84,10 @@
       </button>
     </nav>
     <div class="p-4 border-t border-zinc-900">
-      <div class="text-xs text-zinc-500 mb-2" id="sb-user">—</div>
-      <button onclick="logout()" class="w-full text-left text-sm text-red-400 hover:text-red-300 flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-        Keluar
-      </button>
-      <div class="text-[10px] text-zinc-700 mt-3">v1.0</div>
-      <div class="text-[9px] text-zinc-700 mt-1">&copy; 2026 ciloktech.my.id</div>
+      <div class="text-[10px] text-zinc-700 mt-1">v1.0 &copy; 2026 ciloktech.my.id</div>
     </div>
   </aside>
 
-  <!-- Main content -->
   <main class="flex-1 flex flex-col min-w-0">
     <header class="px-4 md:px-6 py-3 border-b border-zinc-900 flex items-center justify-between bg-zinc-950">
       <div class="flex items-center gap-3">
@@ -147,16 +97,20 @@
         <h2 id="page-title" class="text-lg font-semibold">Dashboard</h2>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="hardRefresh()" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs text-zinc-300" title="Refresh App">
+        <button onclick="hardRefresh()" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs text-zinc-300">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span class="hidden sm:inline">Refresh</span>
+        </button>
+        <button onclick="exportBackup()" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs text-zinc-300" title="Backup Data">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span class="hidden sm:inline">Backup</span>
         </button>
       </div>
     </header>
 
     <div id="content" class="flex-1 overflow-auto p-4 md:p-6">
 
-      <!-- ===== DASHBOARD ===== -->
+      <!-- DASHBOARD -->
       <section id="view-dashboard" class="view active">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="dash-stats"></div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -171,17 +125,21 @@
         </div>
       </section>
 
-      <!-- ===== SUPPLIERS ===== -->
+      <!-- SUPPLIERS -->
       <section id="view-suppliers" class="view">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Daftar Supplier</h3>
-            <button onclick="showAddSupplierModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Tambah Supplier</button>
+            <div class="flex gap-2">
+              <button onclick="exportData('suppliers','csv')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">CSV</button>
+              <button onclick="exportData('suppliers','excel')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">Excel</button>
+              <button onclick="showAddSupplierModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Tambah</button>
+            </div>
           </div>
           <div class="table-wrap">
             <table class="w-full text-sm">
               <thead><tr class="border-b border-zinc-800 text-zinc-400 text-left">
-                <th class="pb-2">Nama</th><th class="pb-2">Kontak</th><th class="pb-2">Telepon</th><th class="pb-2">Aksi</th>
+                <th class="pb-2">Nama</th><th class="pb-2">Kontak</th><th class="pb-2">Telepon</th><th class="pb-2">Alamat</th><th class="pb-2">Aksi</th>
               </tr></thead>
               <tbody id="supplier-table"></tbody>
             </table>
@@ -189,17 +147,22 @@
         </div>
       </section>
 
-      <!-- ===== PURCHASE ORDERS ===== -->
+      <!-- PURCHASE ORDERS -->
       <section id="view-po" class="view">
         <div class="max-w-5xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Purchase Order</h3>
-            <button onclick="showCreatePOModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Buat PO</button>
+            <div class="flex gap-2">
+              <button onclick="exportData('po','csv')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">CSV</button>
+              <button onclick="exportData('po','excel')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">Excel</button>
+              <button onclick="exportData('po','pdf')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">PDF</button>
+              <button onclick="showCreatePOModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Buat PO</button>
+            </div>
           </div>
           <div class="table-wrap">
             <table class="w-full text-sm">
               <thead><tr class="border-b border-zinc-800 text-zinc-400 text-left">
-                <th class="pb-2">No. PO</th><th class="pb-2">Supplier</th><th class="pb-2">Total</th><th class="pb-2">Status</th><th class="pb-2">Tanggal</th><th class="pb-2">Aksi</th>
+                <th class="pb-2">No. PO</th><th class="pb-2">Supplier</th><th class="pb-2">Item</th><th class="pb-2">Total</th><th class="pb-2">Status</th><th class="pb-2">Tanggal</th><th class="pb-2">Aksi</th>
               </tr></thead>
               <tbody id="po-table"></tbody>
             </table>
@@ -207,38 +170,54 @@
         </div>
       </section>
 
-      <!-- ===== RECEIVING ===== -->
+      <!-- RECEIVING -->
       <section id="view-receiving" class="view">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Penerimaan Barang</h3>
-            <button onclick="showReceiveModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Terima Barang</button>
+            <div class="flex gap-2">
+              <button onclick="exportData('receiving','csv')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">CSV</button>
+              <button onclick="exportData('receiving','excel')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">Excel</button>
+              <button onclick="showReceiveModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Terima Barang</button>
+            </div>
           </div>
           <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800 mb-4">
-            <label class="block text-sm text-zinc-400 mb-2">Scan IMEI / SN Barang</label>
+            <label class="block text-sm text-zinc-400 mb-2">Cari Barang di Stok</label>
             <div class="flex gap-2">
-              <input id="receive-imei-input" type="text" placeholder="Scan atau input IMEI/SN..." class="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" onkeydown="if(event.key==='Enter')checkReceivedImei()">
-              <button onclick="checkReceivedImei()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium text-white">Cek</button>
+              <input id="receive-search-input" type="text" placeholder="Cari nama/IMEI/SN..." class="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" onkeydown="if(event.key==='Enter')searchStock()">
+              <button onclick="searchStock()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium text-white">Cari</button>
             </div>
-            <p class="text-xs text-zinc-600 mt-2">Scan barang → cek apakah sudah ada di PO</p>
           </div>
           <div id="receive-result"></div>
+          <h4 class="font-semibold mt-6 mb-3">Riwayat Penerimaan</h4>
+          <div class="table-wrap">
+            <table class="w-full text-sm">
+              <thead><tr class="border-b border-zinc-800 text-zinc-400 text-left">
+                <th class="pb-2">Tanggal</th><th class="pb-2">PO</th><th class="pb-2">Supplier</th><th class="pb-2">Item</th><th class="pb-2">Qty</th><th class="pb-2">Harga Modal</th>
+              </tr></thead>
+              <tbody id="receiving-table"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- ===== PAYMENTS ===== -->
+      <!-- PAYMENTS -->
       <section id="view-payments" class="view">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Pembayaran ke Supplier</h3>
-            <button onclick="showPayModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Bayar</button>
+            <div class="flex gap-2">
+              <button onclick="exportData('payments','csv')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">CSV</button>
+              <button onclick="exportData('payments','excel')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">Excel</button>
+              <button onclick="showPayModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">+ Bayar</button>
+            </div>
           </div>
           <div id="outstanding-list" class="mb-6"></div>
           <h4 class="font-semibold mb-3">Riwayat Pembayaran</h4>
           <div class="table-wrap">
             <table class="w-full text-sm">
               <thead><tr class="border-b border-zinc-800 text-zinc-400 text-left">
-                <th class="pb-2">Tanggal</th><th class="pb-2">Supplier</th><th class="pb-2">No. PO</th><th class="pb-2">Jumlah</th><th class="pb-2">Metode</th>
+                <th class="pb-2">Tanggal</th><th class="pb-2">Supplier</th><th class="pb-2">No. PO</th><th class="pb-2">Jumlah</th><th class="pb-2">Metode</th><th class="pb-2">Aksi</th>
               </tr></thead>
               <tbody id="payment-table"></tbody>
             </table>
@@ -246,14 +225,21 @@
         </div>
       </section>
 
-      <!-- ===== HISTORY ===== -->
+      <!-- HISTORY -->
       <section id="view-history" class="view">
         <div class="max-w-5xl mx-auto">
-          <h3 class="text-lg font-semibold mb-4">Riwayat Lengkap</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Riwayat Lengkap</h3>
+            <div class="flex gap-2">
+              <button onclick="exportData('history','csv')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">CSV</button>
+              <button onclick="exportData('history','excel')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">Excel</button>
+              <button onclick="exportData('history','pdf')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs text-zinc-300">PDF</button>
+            </div>
+          </div>
           <div class="flex gap-2 mb-4">
-            <button onclick="loadHistory('po')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-emerald-600 text-white" data-tab="po">PO</button>
-            <button onclick="loadHistory('receiving')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-zinc-800 text-zinc-400" data-tab="receiving">Penerimaan</button>
-            <button onclick="loadHistory('payment')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-zinc-800 text-zinc-400" data-tab="payment">Pembayaran</button>
+            <button onclick="switchHistTab('po')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-emerald-600 text-white" data-tab="po">PO</button>
+            <button onclick="switchHistTab('receiving')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-zinc-800 text-zinc-400" data-tab="receiving">Penerimaan</button>
+            <button onclick="switchHistTab('payment')" class="hist-tab px-3 py-1.5 rounded-lg text-sm bg-zinc-800 text-zinc-400" data-tab="payment">Pembayaran</button>
           </div>
           <div class="table-wrap">
             <table class="w-full text-sm">
@@ -264,7 +250,7 @@
         </div>
       </section>
 
-      <!-- ===== REPORTS ===== -->
+      <!-- REPORTS -->
       <section id="view-reports" class="view">
         <div class="max-w-5xl mx-auto">
           <h3 class="text-lg font-semibold mb-4">Laporan</h3>
@@ -277,224 +263,111 @@
               <label class="block text-xs text-zinc-500 mb-1">Sampai</label>
               <input type="date" id="report-to" class="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
             </div>
-            <div class="flex items-end">
+            <div class="flex items-end gap-2">
               <button onclick="generateReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white">Generate</button>
-              <button onclick="exportReportExcel()" class="ml-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium text-zinc-300">Export Excel</button>
+              <button onclick="exportReport('csv')" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-zinc-300">CSV</button>
+              <button onclick="exportReport('excel')" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-zinc-300">Excel</button>
+              <button onclick="exportReport('pdf')" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-zinc-300">PDF</button>
             </div>
           </div>
           <div id="report-output"></div>
         </div>
       </section>
 
-    </div><!-- /content -->
+    </div>
   </main>
-</div><!-- /app -->
+</div>
 
-<!-- ===== TOAST ===== -->
 <div id="toast" class="fixed bottom-6 right-6 bg-zinc-800 border border-zinc-700 rounded-xl px-5 py-3 text-sm shadow-lg z-[100] hidden transition-opacity"></div>
-
-<!-- ===== MODALS ===== -->
 <div id="modal-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideModal()">
   <div id="modal-box" class="modal-box bg-zinc-900 rounded-2xl border border-zinc-800 p-6 w-full max-w-md max-h-[90vh] overflow-auto"></div>
 </div>
 
-<!-- ===== MAIN SCRIPT ===== -->
 <script>
 // ============================================================
-// STATE
+// STATE — localStorage
 // ============================================================
-let currentUser = null;
-let allSuppliers = [];
-let allPOs = [];
-let allPayments = [];
-let allProducts = [];
-let allStockMoves = [];
-let historyTab = 'po';
-let reportData = [];
+let allSuppliers=[], allPOs=[], allPayments=[], allStockMoves=[];
+let historyTab='po';
+let reportData=[];
 
-// ============================================================
-// PROTECT PROPRIETARY CODE — DO NOT COPY/REPLICATE
-// ============================================================
+// === Storage helpers ===
+function storeGet(k){try{return JSON.parse(localStorage.getItem('sh_'+k))||[]}catch(e){return[]}}
+function storeSet(k,v){localStorage.setItem('sh_'+k,JSON.stringify(v))}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function genPONumber(){const d=new Date(),y=String(d.getFullYear()).slice(-2),m=String(d.getMonth()+1).padStart(2,'0'),s=String(Math.floor(Math.random()*9000)+1000);return'PO'+y+m+'-'+s}
 
-// === XSS Protection ===
+// === XSS ===
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 
-// ============================================================
-// UTILS
-// ============================================================
+// === Utils ===
 function formatRp(n){return'Rp '+Number(n||0).toLocaleString('id-ID')}
-function formatDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}
-function formatDateShort(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})}
-function col(name){return firebase.firestore().collection(COLLECTIONS[name])}
-function isAdmin(){return currentUser&&currentUser.email===ADMIN_EMAIL}
-function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
+function formatDate(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}
+function formatDateTime(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
 
-function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');t.style.opacity='1';
-  clearTimeout(t._timeout);t._timeout=setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.classList.add('hidden'),300)},3000);
-}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.classList.add('hidden'),300)},3000)}
+function hardRefresh(){location.reload(true)}
 
-function hardRefresh(){if(confirm('Refresh app?'))location.reload(true)}
-
-function generatePONumber(){
-  const d=new Date();
-  const y=d.getFullYear().toString().slice(-2);
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const seq=String(Math.floor(Math.random()*9000)+1000);
-  return`PO${y}${m}-${seq}`;
+// === Load all from localStorage ===
+function loadAll(){
+  allSuppliers=storeGet('suppliers');
+  allPOs=storeGet('pos');
+  allPayments=storeGet('payments');
+  allStockMoves=storeGet('stockMoves');
+  renderDashboard();renderSupplierTable();renderPOTable();renderReceivingTable();renderPaymentTable();
 }
 
 // ============================================================
-// FIREBASE INIT
-// ============================================================
-function initFirebase(){
-  firebase.initializeApp(FIREBASE_CONFIG);
-  firebase.auth().onAuthStateChanged(user=>{
-    if(user){currentUser=user;document.getElementById('login-page').classList.add('hidden');document.getElementById('app').classList.remove('hidden');setText('sb-user',user.email);loadAll()}
-    else{currentUser=null;document.getElementById('login-page').classList.remove('hidden');document.getElementById('app').classList.add('hidden')}
-  });
-}
-
-// ============================================================
-// AUTH
-// ============================================================
-function doLogin(){
-  const e=document.getElementById('login-email').value.trim();
-  const p=document.getElementById('login-pass').value;
-  const err=document.getElementById('login-error');
-  if(!e||!p){err.textContent='Isi email & password';err.classList.remove('hidden');return}
-  err.classList.add('hidden');
-  firebase.auth().signInWithEmailAndPassword(e,p).catch(ex=>{err.textContent=ex.message;err.classList.remove('hidden')});
-}
-function logout(){firebase.auth().signOut()}
-
-// ============================================================
-// DATA LOADING
-// ============================================================
-async function loadAll(){
-  try{
-    const [supSnap, poSnap, paySnap, prodSnap, stockSnap] = await Promise.all([
-      col('suppliers').orderBy('name').get(),
-      col('purchaseOrders').orderBy('createdAt','desc').get(),
-      col('payments').orderBy('createdAt','desc').get(),
-      col('products').orderBy('name').get(),
-      col('stockMoves').orderBy('createdAt','desc').get()
-    ]);
-    allSuppliers=supSnap.docs.map(d=>({id:d.id,...d.data()}));
-    allPOs=poSnap.docs.map(d=>({id:d.id,...d.data()}));
-    allPayments=paySnap.docs.map(d=>({id:d.id,...d.data()}));
-    allProducts=prodSnap.docs.map(d=>({id:d.id,...d.data()}));
-    allStockMoves=stockSnap.docs.map(d=>({id:d.id,...d.data()}));
-    renderDashboard();renderSupplierTable();renderPOTable();renderPaymentTable();
-  }catch(e){console.error('loadAll:',e);showToast('Gagal memuat data')}
-}
-
-// ============================================================
-// VIEW SWITCHING
+// NAVIGATION
 // ============================================================
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-backdrop').classList.toggle('show')}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-backdrop').classList.remove('show')}
 
 const viewTitles={dashboard:'Dashboard',suppliers:'Supplier',po:'Purchase Order',receiving:'Penerimaan',payments:'Pembayaran',history:'Riwayat',reports:'Laporan'};
-
 function switchView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   const el=document.getElementById('view-'+name);if(el)el.classList.add('active');
-  setText('page-title',viewTitles[name]||name);
-  document.querySelectorAll('.nav-btn').forEach(b=>{
-    b.classList.remove('active','text-zinc-100');b.classList.add('text-zinc-400');
-    if(b.dataset.view===name){b.classList.add('active','text-zinc-100');b.classList.remove('text-zinc-400')}
-  });
+  document.getElementById('page-title').textContent=viewTitles[name]||name;
+  document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('active','text-zinc-100');b.classList.add('text-zinc-400');if(b.dataset.view===name){b.classList.add('active','text-zinc-100');b.classList.remove('text-zinc-400')}});
   closeSidebar();
-  if(name==='dashboard')renderDashboard();
   if(name==='history')loadHistory(historyTab);
   if(name==='reports')setDefaultDates();
 }
-
-document.getElementById('nav-menu').addEventListener('click',e=>{
-  const btn=e.target.closest('[data-view]');if(btn)switchView(btn.dataset.view);
-});
-
-// ============================================================
-// PULL TO REFRESH
-// ============================================================
-function setupPullToRefresh(){
-  let startY=0,pulling=false;
-  const c=document.getElementById('content');
-  c.addEventListener('touchstart',e=>{if(c.scrollTop===0)startY=e.touches[0].clientY;pulling=true},{passive:true});
-  c.addEventListener('touchmove',e=>{
-    if(!pulling)return;
-    const dy=e.touches[0].clientY-startY;
-    if(dy>60&&c.scrollTop===0){document.getElementById('ptr-indicator').classList.add('show')}
-  },{passive:true});
-  c.addEventListener('touchend',()=>{
-    if(document.getElementById('ptr-indicator').classList.contains('show')){loadAll();showToast('Data direfresh')}
-    document.getElementById('ptr-indicator').classList.remove('show');pulling=false;
-  });
-}
+document.getElementById('nav-menu').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)switchView(b.dataset.view)});
 
 // ============================================================
 // DASHBOARD
 // ============================================================
 function renderDashboard(){
-  const activePOs=allPOs.filter(p=>p.status!=='received');
-  const totalOutstanding=allPOs.reduce((s,p)=>s+((p.totalAmount||0)-(p.paidAmount||0)),0);
-  const totalSpentThisMonth=allPOs.filter(p=>{
-    if(!p.createdAt)return false;const d=p.createdAt.toDate?p.createdAt.toDate():new Date(p.createdAt);
-    const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-  }).reduce((s,p)=>s+(p.totalAmount||0),0);
+  const active=allPOs.filter(p=>p.status!=='received');
+  const outstanding=allPOs.reduce((s,p)=>s+Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)),0);
+  const now=new Date();
+  const monthPOs=allPOs.filter(p=>{const d=new Date(p.createdAt);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()});
+  const monthTotal=monthPOs.reduce((s,p)=>s+(p.totalAmount||0),0);
 
   document.getElementById('dash-stats').innerHTML=`
-    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">PO Aktif</div><div class="text-2xl font-bold text-emerald-400">${activePOs.length}</div></div>
+    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">PO Aktif</div><div class="text-2xl font-bold text-emerald-400">${active.length}</div></div>
     <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">Total Supplier</div><div class="text-2xl font-bold">${allSuppliers.length}</div></div>
-    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">Belum Dibayar</div><div class="text-2xl font-bold text-yellow-400">${formatRp(totalOutstanding)}</div></div>
-    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">Belanja Bulan Ini</div><div class="text-2xl font-bold">${formatRp(totalSpentThisMonth)}</div></div>
-  `;
+    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">Belum Dibayar</div><div class="text-2xl font-bold text-yellow-400">${formatRp(outstanding)}</div></div>
+    <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500 mb-1">Belanja Bulan Ini</div><div class="text-2xl font-bold">${formatRp(monthTotal)}</div></div>`;
 
-  // Active POs
-  if(activePOs.length>0){
-    document.getElementById('dash-active-po').innerHTML=activePOs.slice(0,5).map(p=>`
-      <div class="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
-        <div><span class="font-medium">${esc(p.poNumber)}</span><span class="text-zinc-500 ml-2">${esc(p.supplierName)}</span></div>
-        <div><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span><span class="ml-2 text-zinc-400">${formatRp(p.totalAmount)}</span></div>
-      </div>
-    `).join('');
-  } else {
-    document.getElementById('dash-active-po').innerHTML='<p class="text-zinc-600">Tidak ada PO aktif</p>';
-  }
+  if(active.length>0){
+    document.getElementById('dash-active-po').innerHTML=active.slice(0,5).map(p=>`<div class="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0"><div><span class="font-medium">${esc(p.poNumber)}</span> <span class="text-zinc-500 text-xs">${esc(p.supplierName)}</span></div><div><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span> <span class="ml-2 text-zinc-400 tabular">${formatRp(p.totalAmount)}</span></div></div>`).join('');
+  } else {document.getElementById('dash-active-po').innerHTML='<p class="text-zinc-600">Tidak ada PO aktif</p>'}
 
-  // Top suppliers
-  const supplierTotals={};
-  allPOs.forEach(p=>{if(!supplierTotals[p.supplierName])supplierTotals[p.supplierName]=0;supplierTotals[p.supplierName]+=(p.totalAmount||0)});
-  const sorted=Object.entries(supplierTotals).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(sorted.length>0){
-    document.getElementById('dash-top-suppliers').innerHTML=sorted.map(([name,total])=>`
-      <div class="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
-        <span>${esc(name)}</span><span class="text-emerald-400 font-medium">${formatRp(total)}</span>
-      </div>
-    `).join('');
-  } else {
-    document.getElementById('dash-top-suppliers').innerHTML='<p class="text-zinc-600">Belum ada data</p>';
-  }
+  const st={};allPOs.forEach(p=>{st[p.supplierName]=(st[p.supplierName]||0)+(p.totalAmount||0)});
+  const sorted=Object.entries(st).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(sorted.length>0){document.getElementById('dash-top-suppliers').innerHTML=sorted.map(([n,t])=>`<div class="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0"><span>${esc(n)}</span><span class="text-emerald-400 font-medium tabular">${formatRp(t)}</span></div>`).join('')}
+  else{document.getElementById('dash-top-suppliers').innerHTML='<p class="text-zinc-600">Belum ada data</p>'}
 }
 
 // ============================================================
-// SUPPLIERS CRUD
+// SUPPLIERS
 // ============================================================
 function renderSupplierTable(){
   const tb=document.getElementById('supplier-table');
-  if(!allSuppliers.length){tb.innerHTML='<tr><td colspan="4" class="py-4 text-center text-zinc-600">Belum ada supplier</td></tr>';return}
-  tb.innerHTML=allSuppliers.map(s=>`
-    <tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50">
-      <td class="py-3 font-medium">${esc(s.name)}</td>
-      <td class="py-3 text-zinc-400">${esc(s.contact||'—')}</td>
-      <td class="py-3 text-zinc-400">${esc(s.phone||'—')}</td>
-      <td class="py-3">
-        <button onclick="showEditSupplierModal('${s.id}')" class="text-xs text-emerald-400 hover:text-emerald-300 mr-2">Edit</button>
-        <button onclick="deleteSupplier('${s.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button>
-      </td>
-    </tr>
-  `).join('');
+  if(!allSuppliers.length){tb.innerHTML='<tr><td colspan="5" class="py-4 text-center text-zinc-600">Belum ada supplier</td></tr>';return}
+  tb.innerHTML=allSuppliers.map(s=>`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(s.name)}</td><td class="py-3 text-zinc-400">${esc(s.contact||'—')}</td><td class="py-3 text-zinc-400">${esc(s.phone||'—')}</td><td class="py-3 text-zinc-400">${esc(s.address||'—')}</td><td class="py-3"><button onclick="showEditSupplierModal('${s.id}')" class="text-xs text-emerald-400 hover:text-emerald-300 mr-2">Edit</button><button onclick="deleteSupplier('${s.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`).join('');
 }
 
 function showAddSupplierModal(){
@@ -507,21 +380,15 @@ function showAddSupplierModal(){
       <input id="s-address" placeholder="Alamat" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
       <textarea id="s-notes" placeholder="Catatan" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"></textarea>
     </div>
-    <div class="flex gap-2 mt-4">
-      <button onclick="saveSupplier()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Simpan</button>
-      <button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button>
-    </div>
-  `;
+    <div class="flex gap-2 mt-4"><button onclick="saveSupplier()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Simpan</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
   showModal();
 }
 
-async function saveSupplier(){
+function saveSupplier(){
   const name=document.getElementById('s-name').value.trim();
   if(!name){showToast('Nama wajib diisi');return}
-  try{
-    await col('suppliers').add({name,contact:document.getElementById('s-contact').value.trim(),phone:document.getElementById('s-phone').value.trim(),address:document.getElementById('s-address').value.trim(),notes:document.getElementById('s-notes').value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-    hideModal();showToast('Supplier ditambahkan');loadAll();
-  }catch(e){showToast('Gagal: '+e.message)}
+  allSuppliers.push({id:genId(),name,contact:v('s-contact'),phone:v('s-phone'),address:v('s-address'),notes:v('s-notes'),createdAt:new Date().toISOString()});
+  storeSet('suppliers',allSuppliers);hideModal();showToast('Supplier ditambahkan');renderSupplierTable();renderDashboard();
 }
 
 function showEditSupplierModal(id){
@@ -535,28 +402,20 @@ function showEditSupplierModal(id){
       <input id="s-address" value="${esc(s.address||'')}" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
       <textarea id="s-notes" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">${esc(s.notes||'')}</textarea>
     </div>
-    <div class="flex gap-2 mt-4">
-      <button onclick="updateSupplier('${id}')" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Update</button>
-      <button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button>
-    </div>
-  `;
+    <div class="flex gap-2 mt-4"><button onclick="updateSupplier('${id}')" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Update</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
   showModal();
 }
 
-async function updateSupplier(id){
-  const name=document.getElementById('s-name').value.trim();
-  if(!name){showToast('Nama wajib diisi');return}
-  try{
-    await col('suppliers').doc(id).update({name,contact:document.getElementById('s-contact').value.trim(),phone:document.getElementById('s-phone').value.trim(),address:document.getElementById('s-address').value.trim(),notes:document.getElementById('s-notes').value.trim()});
-    hideModal();showToast('Supplier diupdate');loadAll();
-  }catch(e){showToast('Gagal: '+e.message)}
+function updateSupplier(id){
+  const i=allSuppliers.findIndex(x=>x.id===id);if(i<0)return;
+  const name=document.getElementById('s-name').value.trim();if(!name){showToast('Nama wajib');return}
+  allSuppliers[i]={...allSuppliers[i],name,contact:v('s-contact'),phone:v('s-phone'),address:v('s-address'),notes:v('s-notes')};
+  storeSet('suppliers',allSuppliers);hideModal();showToast('Supplier diupdate');renderSupplierTable();
 }
 
-async function deleteSupplier(id){
-  if(!confirm('Hapus supplier ini?'))return;
-  try{await col('suppliers').doc(id).delete();showToast('Supplier dihapus');loadAll();}
-  catch(e){showToast('Gagal: '+e.message)}
-}
+function deleteSupplier(id){if(!confirm('Hapus supplier?'))return;allSuppliers=allSuppliers.filter(x=>x.id!==id);storeSet('suppliers',allSuppliers);showToast('Dihapus');renderSupplierTable();renderDashboard()}
+
+function v(id){return(document.getElementById(id)||{}).value||''}
 
 // ============================================================
 // PURCHASE ORDERS
@@ -565,171 +424,95 @@ let poItems=[];
 
 function renderPOTable(){
   const tb=document.getElementById('po-table');
-  if(!allPOs.length){tb.innerHTML='<tr><td colspan="6" class="py-4 text-center text-zinc-600">Belum ada PO</td></tr>';return}
-  tb.innerHTML=allPOs.map(p=>{
-    const remaining=(p.totalAmount||0)-(p.paidAmount||0);
-    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50">
-      <td class="py-3 font-medium">${esc(p.poNumber)}</td>
-      <td class="py-3 text-zinc-400">${esc(p.supplierName)}</td>
-      <td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${remaining>0?'text-yellow-400':'text-emerald-400'}">${remaining>0?'Sisa: '+formatRp(remaining):'Lunas'}</span></td>
-      <td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td>
-      <td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td>
-      <td class="py-3">
-        ${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300 mr-2">Kirim</button>`:''}
-        ${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-emerald-400 hover:text-emerald-300 mr-2">Diterima</button>`:''}
-        <button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button>
-      </td>
-    </tr>`;
+  if(!allPOs.length){tb.innerHTML='<tr><td colspan="7" class="py-4 text-center text-zinc-600">Belum ada PO</td></tr>';return}
+  tb.innerHTML=allPOs.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>{
+    const rem=Math.max(0,(p.totalAmount||0)-(p.paidAmount||0));
+    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(p.poNumber)}</td><td class="py-3 text-zinc-400">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${p.items?p.items.length+' item':'—'}</td><td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${rem>0?'text-yellow-400':'text-emerald-400'}">${rem>0?'Sisa: '+formatRp(rem):'Lunas'}</span></td><td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td><td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td><td class="py-3">${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300 mr-2">Kirim</button>`:''}${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-emerald-400 hover:text-emerald-300 mr-2">Diterima</button>`:''}<button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`;
   }).join('');
 }
 
 function showCreatePOModal(){
   poItems=[{description:'',qty:1,costPrice:0}];
-  const supplierOpts=allSuppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  const opts=allSuppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Buat Purchase Order</h3>
     <div class="space-y-3">
-      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-        <option value="">Pilih Supplier</option>${supplierOpts}
-      </select>
+      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih Supplier</option>${opts}</select>
       <textarea id="po-notes" placeholder="Catatan" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"></textarea>
     </div>
-    <h4 class="font-semibold mt-4 mb-2">Item</h4>
-    <div id="po-items-container" class="space-y-2"></div>
+    <h4 class="font-semibold mt-4 mb-2">Item</h4><div id="po-items-ct" class="space-y-2"></div>
     <button onclick="addPOItem()" class="text-sm text-emerald-400 hover:text-emerald-300 mt-2">+ Tambah Item</button>
-    <div class="flex gap-2 mt-4">
-      <button onclick="savePO()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Simpan PO</button>
-      <button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button>
-    </div>
-  `;
+    <div class="flex gap-2 mt-4"><button onclick="savePO()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Simpan PO</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
   renderPOItems();showModal();
 }
 
 function renderPOItems(){
-  document.getElementById('po-items-container').innerHTML=poItems.map((item,i)=>`
-    <div class="flex gap-2 items-center">
-      <input placeholder="Deskripsi" value="${esc(item.description)}" onchange="poItems[${i}].description=this.value" class="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
-      <input type="number" placeholder="Qty" value="${item.qty}" min="1" onchange="poItems[${i}].qty=Number(this.value)" class="w-16 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
-      <input type="number" placeholder="Harga Modal" value="${item.costPrice}" onchange="poItems[${i}].costPrice=Number(this.value)" class="w-28 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
-      <button onclick="poItems.splice(${i},1);renderPOItems()" class="text-red-400 hover:text-red-300 text-lg">&times;</button>
-    </div>
-  `).join('');
+  document.getElementById('po-items-ct').innerHTML=poItems.map((it,i)=>`<div class="flex gap-2 items-center"><input placeholder="Deskripsi" value="${esc(it.description)}" onchange="poItems[${i}].description=this.value" class="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500"><input type="number" placeholder="Qty" value="${it.qty}" min="1" onchange="poItems[${i}].qty=Number(this.value)" class="w-16 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500"><input type="number" placeholder="Harga Modal" value="${it.costPrice}" onchange="poItems[${i}].costPrice=Number(this.value)" class="w-28 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-emerald-500"><button onclick="poItems.splice(${i},1);renderPOItems()" class="text-red-400 hover:text-red-300 text-lg">&times;</button></div>`).join('');
 }
-
 function addPOItem(){poItems.push({description:'',qty:1,costPrice:0});renderPOItems()}
 
-async function savePO(){
-  const supplierId=document.getElementById('po-supplier').value;
-  if(!supplierId){showToast('Pilih supplier');return}
-  if(!poItems.length){showToast('Tambah minimal 1 item');return}
-  const supplier=allSuppliers.find(s=>s.id===supplierId);
-  const totalAmount=poItems.reduce((s,item)=>s+(item.qty*item.costPrice),0);
-  try{
-    await col('purchaseOrders').add({
-      poNumber:generatePONumber(),supplierId,supplierName:supplier?supplier.name:'—',
-      items:poItems.map(it=>({...it})),status:'draft',
-      totalAmount,paidAmount:0,
-      notes:document.getElementById('po-notes').value.trim(),
-      createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    hideModal();showToast('PO dibuat');loadAll();
-  }catch(e){showToast('Gagal: '+e.message)}
+function savePO(){
+  const sid=document.getElementById('po-supplier').value;if(!sid){showToast('Pilih supplier');return}
+  if(!poItems.length){showToast('Tambah item');return}
+  const s=allSuppliers.find(x=>x.id===sid);
+  allPOs.push({id:genId(),poNumber:genPONumber(),supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],status:'draft',totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),paidAmount:0,notes:v('po-notes'),createdAt:new Date().toISOString()});
+  storeSet('pos',allPOs);hideModal();showToast('PO dibuat');renderPOTable();renderDashboard();
 }
 
-async function updatePOStatus(id,status){
-  if(!confirm(`Ubah status ke "${status}"?`))return;
-  try{await col('purchaseOrders').doc(id).update({status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});showToast('Status diupdate');loadAll();}
-  catch(e){showToast('Gagal: '+e.message)}
-}
-
-async function deletePO(id){
-  if(!confirm('Hapus PO ini?'))return;
-  try{await col('purchaseOrders').doc(id).delete();showToast('PO dihapus');loadAll();}
-  catch(e){showToast('Gagal: '+e.message)}
-}
+function updatePOStatus(id,status){if(!confirm('Ubah status?'))return;const i=allPOs.findIndex(x=>x.id===id);if(i<0)return;allPOs[i].status=status;storeSet('pos',allPOs);showToast('Status diupdate');renderPOTable();renderDashboard()}
+function deletePO(id){if(!confirm('Hapus PO?'))return;allPOs=allPOs.filter(x=>x.id!==id);storeSet('pos',allPOs);showToast('Dihapus');renderPOTable();renderDashboard()}
 
 // ============================================================
 // RECEIVING
 // ============================================================
-function checkReceivedImei(){
-  const imei=document.getElementById('receive-imei-input').value.trim();
-  if(!imei){showToast('Input IMEI/SN');return}
-  // Find in products
-  const product=allProducts.find(p=>p.imei===imei||p.serialNumber===imei);
-  if(product){
-    document.getElementById('receive-result').innerHTML=`
-      <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
-        <h4 class="font-semibold text-emerald-400 mb-2">✓ Ditemukan</h4>
-        <p class="text-sm">Nama: <b>${esc(product.name)}</b></p>
-        <p class="text-sm">IMEI/SN: ${esc(product.imei||product.serialNumber||'—')}</p>
-        <p class="text-sm">Stok: ${product.stock||0}</p>
-      </div>`;
+function searchStock(){
+  const q=(document.getElementById('receive-search-input').value||'').trim().toLowerCase();
+  if(!q){showToast('Input kata kunci');return}
+  const matches=allStockMoves.filter(m=>(m.description||'').toLowerCase().includes(q)||(m.poNumber||'').toLowerCase().includes(q)||(m.supplierName||'').toLowerCase().includes(q));
+  const el=document.getElementById('receive-result');
+  if(matches.length>0){
+    el.innerHTML=`<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800"><h4 class="font-semibold text-emerald-400 mb-2">Ditemukan ${matches.length} record</h4>${matches.slice(0,10).map(m=>`<div class="py-2 border-b border-zinc-800 last:border-0 text-sm"><span class="font-medium">${esc(m.description)}</span> <span class="text-zinc-500">x${m.qty}</span> <span class="text-zinc-400">${formatRp(m.costPrice)}</span> <span class="text-xs text-zinc-600">PO: ${esc(m.poNumber||'—')}</span></div>`).join('')}</div>`;
   } else {
-    document.getElementById('receive-result').innerHTML=`
-      <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
-        <h4 class="font-semibold text-yellow-400 mb-2">⊘ Tidak Ditemukan</h4>
-        <p class="text-sm text-zinc-400">IMEI/SN <b>${esc(imei)}</b> belum ada di sistem.</p>
-        <p class="text-xs text-zinc-500 mt-2">Barang ini perlu ditambahkan via Restock di POS atau via PO.</p>
-      </div>`;
+    el.innerHTML=`<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800"><h4 class="font-semibold text-yellow-400">Tidak ditemukan</h4><p class="text-sm text-zinc-400 mt-1">Barang belum ada di sistem. Tambah via PO → Terima Barang.</p></div>`;
   }
 }
 
+function renderReceivingTable(){
+  const tb=document.getElementById('receiving-table');
+  if(!allStockMoves.length){tb.innerHTML='<tr><td colspan="6" class="py-4 text-center text-zinc-600">Belum ada penerimaan</td></tr>';return}
+  tb.innerHTML=allStockMoves.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(m=>`<tr class="border-b border-zinc-800/50"><td class="py-2 text-xs">${formatDate(m.createdAt)}</td><td class="text-xs">${esc(m.poNumber||'—')}</td><td class="text-xs text-zinc-400">${esc(m.supplierName||'—')}</td><td class="text-xs">${esc(m.description)}</td><td class="text-xs">${m.qty}</td><td class="text-xs tabular">${formatRp(m.costPrice)}</td></tr>`).join('');
+}
+
 function showReceiveModal(){
-  const pendingPOs=allPOs.filter(p=>p.status==='sent');
-  const poOpts=pendingPOs.map(p=>`<option value="${p.id}">${esc(p.poNumber)} - ${esc(p.supplierName)} (${formatRp(p.totalAmount)})</option>`).join('');
+  const pending=allPOs.filter(p=>p.status==='sent');
+  if(!pending.length){showToast('Tidak ada PO yang perlu diterima');return}
+  const opts=pending.map(p=>`<option value="${p.id}">${esc(p.poNumber)} - ${esc(p.supplierName)} (${p.items?p.items.length:'0'} item)</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Terima Barang dari PO</h3>
     <div class="space-y-3">
-      <select id="recv-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-        <option value="">Pilih PO</option>${poOpts}
-      </select>
+      <select id="recv-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih PO</option>${opts}</select>
       <div id="recv-po-items"></div>
     </div>
-    <div class="flex gap-2 mt-4">
-      <button onclick="processReceiving()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Konfirmasi Terima</button>
-      <button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button>
-    </div>
-  `;
+    <div class="flex gap-2 mt-4"><button onclick="processReceiving()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Konfirmasi Terima</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
   document.getElementById('recv-po').addEventListener('change',e=>{
     const po=allPOs.find(p=>p.id===e.target.value);
-    if(po){
-      document.getElementById('recv-po-items').innerHTML=po.items.map((it,i)=>`
-        <div class="flex items-center gap-2 py-2 border-b border-zinc-800">
-          <input type="checkbox" checked id="recv-item-${i}" class="accent-emerald-500">
-          <span class="flex-1 text-sm">${esc(it.description||'Item '+(i+1))}</span>
-          <span class="text-xs text-zinc-400">x${it.qty}</span>
-          <span class="text-xs tabular">${formatRp(it.costPrice)}</span>
-        </div>
-      `).join('');
-    } else {
-      document.getElementById('recv-po-items').innerHTML='';
-    }
+    if(po&&po.items){document.getElementById('recv-po-items').innerHTML=po.items.map((it,i)=>`<div class="flex items-center gap-2 py-2 border-b border-zinc-800"><input type="checkbox" checked id="ri-${i}" class="accent-emerald-500"><span class="flex-1 text-sm">${esc(it.description||'Item '+(i+1))}</span><span class="text-xs text-zinc-400">x${it.qty}</span><span class="text-xs tabular">${formatRp(it.costPrice)}</span></div>`).join('')}
   });
   showModal();
 }
 
-async function processReceiving(){
-  const poId=document.getElementById('recv-po').value;
-  if(!poId){showToast('Pilih PO');return}
-  const po=allPOs.find(p=>p.id===poId);
-  if(!po)return;
-  try{
-    // Create stock move entries for each received item
-    for(let i=0;i<po.items.length;i++){
-      const chk=document.getElementById('recv-item-'+i);
-      if(chk&&chk.checked){
-        await col('stockMoves').add({
-          type:'restock',productId:po.items[i].productId||'',description:po.items[i].description,
-          quantity:po.items[i].qty,costPrice:po.items[i].costPrice,
-          poNumber:po.poNumber,supplierName:po.supplierName,
-          createdAt:firebase.firestore.FieldValue.serverTimestamp()
-        });
+function processReceiving(){
+  const poId=document.getElementById('recv-po').value;if(!poId){showToast('Pilih PO');return}
+  const po=allPOs.find(p=>p.id===poId);if(!po)return;
+  if(po.items){
+    po.items.forEach((it,i)=>{
+      const chk=document.getElementById('ri-'+i);if(chk&&chk.checked){
+        allStockMoves.push({id:genId(),type:'restock',description:it.description,qty:it.qty,costPrice:it.costPrice,poNumber:po.poNumber,supplierName:po.supplierName,createdAt:new Date().toISOString()});
       }
-    }
-    // Update PO status to received
-    await col('purchaseOrders').doc(poId).update({status:'received',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-    hideModal();showToast('Penerimaan tercatat');loadAll();
-  }catch(e){showToast('Gagal: '+e.message)}
+    });
+  }
+  const pi=allPOs.findIndex(p=>p.id===poId);if(pi>=0)allPOs[pi].status='received';
+  storeSet('stockMoves',allStockMoves);storeSet('pos',allPOs);hideModal();showToast('Penerimaan tercatat');renderPOTable();renderReceivingTable();renderDashboard();
 }
 
 // ============================================================
@@ -737,163 +520,148 @@ async function processReceiving(){
 // ============================================================
 function renderPaymentTable(){
   const tb=document.getElementById('payment-table');
-  if(!allPayments.length){tb.innerHTML='<tr><td colspan="5" class="py-4 text-center text-zinc-600">Belum ada pembayaran</td></tr>';return}
-  tb.innerHTML=allPayments.map(p=>`
-    <tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50">
-      <td class="py-3 text-zinc-400">${formatDate(p.createdAt)}</td>
-      <td class="py-3">${esc(p.supplierName)}</td>
-      <td class="py-3 text-zinc-400">${esc(p.poNumber||'—')}</td>
-      <td class="py-3 text-emerald-400 font-medium tabular">${formatRp(p.amount)}</td>
-      <td class="py-3 text-zinc-400">${esc(p.method||'Tunai')}</td>
-    </tr>
-  `).join('');
+  if(!allPayments.length){tb.innerHTML='<tr><td colspan="6" class="py-4 text-center text-zinc-600">Belum ada pembayaran</td></tr>';return}
+  tb.innerHTML=allPayments.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>`<tr class="border-b border-zinc-800/50"><td class="py-3 text-xs">${formatDate(p.createdAt)}</td><td class="py-3">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${esc(p.poNumber||'—')}</td><td class="py-3 text-emerald-400 font-medium tabular">${formatRp(p.amount)}</td><td class="py-3 text-zinc-400">${esc(p.method||'Tunai')}</td><td class="py-3"><button onclick="deletePayment('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`).join('');
 
-  // Outstanding summary
-  const outstanding={};
-  allPOs.forEach(p=>{
-    const rem=(p.totalAmount||0)-(p.paidAmount||0);
-    if(rem>0){
-      if(!outstanding[p.supplierName])outstanding[p.supplierName]={total:0,poCount:0};
-      outstanding[p.supplierName].total+=rem;
-      outstanding[p.supplierName].poCount++;
-    }
-  });
+  const outstanding={};allPOs.forEach(p=>{const rem=Math.max(0,(p.totalAmount||0)-(p.paidAmount||0));if(rem>0){if(!outstanding[p.supplierName])outstanding[p.supplierName]={total:0,cnt:0};outstanding[p.supplierName].total+=rem;outstanding[p.supplierName].cnt++}});
   const entries=Object.entries(outstanding);
-  if(entries.length>0){
-    document.getElementById('outstanding-list').innerHTML=`
-      <h4 class="font-semibold mb-2">Hutang Tertunggak</h4>
-      ${entries.map(([name,data])=>`
-        <div class="flex items-center justify-between py-3 px-4 bg-zinc-900 rounded-xl border border-zinc-800 mb-2">
-          <div><span class="font-medium">${esc(name)}</span><span class="text-xs text-zinc-500 ml-2">${data.poCount} PO</span></div>
-          <span class="text-yellow-400 font-bold tabular">${formatRp(data.total)}</span>
-        </div>
-      `).join('')}
-    `;
-  } else {
-    document.getElementById('outstanding-list').innerHTML='<p class="text-zinc-600 text-sm mb-4">✓ Tidak ada hutang</p>';
-  }
+  document.getElementById('outstanding-list').innerHTML=entries.length>0?`<h4 class="font-semibold mb-2">Hutang Tertunggak</h4>${entries.map(([n,d])=>`<div class="flex items-center justify-between py-3 px-4 bg-zinc-900 rounded-xl border border-zinc-800 mb-2"><div><span class="font-medium">${esc(n)}</span><span class="text-xs text-zinc-500 ml-2">${d.cnt} PO</span></div><span class="text-yellow-400 font-bold tabular">${formatRp(d.total)}</span></div>`).join('')}`:'<p class="text-zinc-600 text-sm mb-4">✓ Tidak ada hutang</p>';
 }
 
 function showPayModal(){
-  // POs with outstanding balance
-  const unpaidPOs=allPOs.filter(p=>(p.totalAmount||0)-(p.paidAmount||0)>0);
-  const poOpts=unpaidPOs.map(p=>`<option value="${p.id}" data-supplier="${esc(p.supplierName)}">${esc(p.poNumber)} - ${esc(p.supplierName)} (Sisa: ${formatRp((p.totalAmount||0)-(p.paidAmount||0))})</option>`).join('');
+  const unpaid=allPOs.filter(p=>Math.max(0,(p.totalAmount||0)-(p.paidAmount||0))>0);
+  if(!unpaid.length){showToast('Tidak ada PO yang belum dibayar');return}
+  const opts=unpaid.map(p=>`<option value="${p.id}">${esc(p.poNumber)} - ${esc(p.supplierName)} (Sisa: ${formatRp(Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)))})</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Bayar ke Supplier</h3>
     <div class="space-y-3">
-      <select id="pay-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-        <option value="">Pilih PO</option>${poOpts}
-      </select>
+      <select id="pay-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih PO</option>${opts}</select>
       <input id="pay-amount" type="number" placeholder="Jumlah Bayar" min="0" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-      <select id="pay-method" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-        <option value="Tunai">Tunai</option><option value="Transfer Bank">Transfer Bank</option><option value="E-Wallet">E-Wallet</option><option value="Lainnya">Lainnya</option>
-      </select>
+      <select id="pay-method" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option><option>Lainnya</option></select>
       <input id="pay-notes" placeholder="Catatan" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
     </div>
-    <div class="flex gap-2 mt-4">
-      <button onclick="processPayment()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Bayar</button>
-      <button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button>
-    </div>
-  `;
+    <div class="flex gap-2 mt-4"><button onclick="processPayment()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Bayar</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
   showModal();
 }
 
-async function processPayment(){
-  const poId=document.getElementById('pay-po').value;
-  const amount=Number(document.getElementById('pay-amount').value);
-  if(!poId){showToast('Pilih PO');return}
-  if(!amount||amount<=0){showToast('Jumlah tidak valid');return}
-  const po=allPOs.find(p=>p.id===poId);
-  if(!po)return;
-  const remaining=(po.totalAmount||0)-(po.paidAmount||0);
-  if(amount>remaining){showToast('Melebihi sisa: '+formatRp(remaining));return}
-  try{
-    await col('payments').add({
-      poId,poNumber:po.poNumber,supplierId:po.supplierId,supplierName:po.supplierName,
-      amount,method:document.getElementById('pay-method').value,
-      notes:document.getElementById('pay-notes').value.trim(),
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await col('purchaseOrders').doc(poId).update({paidAmount:(po.paidAmount||0)+amount,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-    hideModal();showToast('Pembayaran tercatat');loadAll();
-  }catch(e){showToast('Gagal: '+e.message)}
+function processPayment(){
+  const poId=document.getElementById('pay-po').value;const amt=Number(document.getElementById('pay-amount').value);
+  if(!poId){showToast('Pilih PO');return}if(!amt||amt<=0){showToast('Jumlah tidak valid');return}
+  const po=allPOs.find(p=>p.id===poId);if(!po)return;
+  const rem=Math.max(0,(po.totalAmount||0)-(po.paidAmount||0));
+  if(amt>rem){showToast('Melebihi sisa: '+formatRp(rem));return}
+  allPayments.push({id:genId(),poId,poNumber:po.poNumber,supplierId:po.supplierId,supplierName:po.supplierName,amount:amt,method:v('pay-method'),notes:v('pay-notes'),createdAt:new Date().toISOString()});
+  const pi=allPOs.findIndex(p=>p.id===poId);if(pi>=0)allPOs[pi].paidAmount=(allPOs[pi].paidAmount||0)+amt;
+  storeSet('payments',allPayments);storeSet('pos',allPOs);hideModal();showToast('Pembayaran tercatat');renderPaymentTable();renderDashboard();
 }
+
+function deletePayment(id){if(!confirm('Hapus pembayaran?'))return;allPayments=allPayments.filter(x=>x.id!==id);storeSet('payments',allPayments);showToast('Dihapus');renderPaymentTable();renderDashboard()}
 
 // ============================================================
 // HISTORY
 // ============================================================
+function switchHistTab(tab){historyTab=tab;loadHistory(tab)}
 function loadHistory(tab){
   historyTab=tab;
-  document.querySelectorAll('.hist-tab').forEach(b=>{
-    b.classList.remove('bg-emerald-600','text-white');b.classList.add('bg-zinc-800','text-zinc-400');
-    if(b.dataset.tab===tab){b.classList.add('bg-emerald-600','text-white');b.classList.remove('bg-zinc-800','text-zinc-400')}
-  });
-
-  const head=document.getElementById('history-head');
-  const body=document.getElementById('history-body');
-
+  document.querySelectorAll('.hist-tab').forEach(b=>{b.classList.remove('bg-emerald-600','text-white');b.classList.add('bg-zinc-800','text-zinc-400');if(b.dataset.tab===tab){b.classList.add('bg-emerald-600','text-white');b.classList.remove('bg-zinc-800','text-zinc-400')}});
+  const head=document.getElementById('history-head'),body=document.getElementById('history-body');
   if(tab==='po'){
     head.innerHTML='<tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Tanggal</th><th class="pb-2">No. PO</th><th class="pb-2">Supplier</th><th class="pb-2">Total</th><th class="pb-2">Status</th></tr>';
-    body.innerHTML=allPOs.map(p=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${formatDate(p.createdAt)}</td><td class="font-medium">${esc(p.poNumber)}</td><td>${esc(p.supplierName)}</td><td class="tabular">${formatRp(p.totalAmount)}</td><td><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td></tr>`).join('')||'<tr><td colspan="5" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
+    body.innerHTML=allPOs.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>`<tr class="border-b border-zinc-800/50"><td class="py-2 text-xs">${formatDateTime(p.createdAt)}</td><td class="font-medium">${esc(p.poNumber)}</td><td>${esc(p.supplierName)}</td><td class="tabular">${formatRp(p.totalAmount)}</td><td><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td></tr>`).join('')||'<tr><td colspan="5" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
   } else if(tab==='receiving'){
-    head.innerHTML='<tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Tanggal</th><th class="pb-2">Deskripsi</th><th class="pb-2">Qty</th><th class="pb-2">Harga Modal</th><th class="pb-2">PO</th></tr>';
-    const moves=allStockMoves.filter(m=>m.type==='restock');
-    body.innerHTML=moves.map(m=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${formatDate(m.createdAt)}</td><td>${esc(m.description)}</td><td>${m.quantity}</td><td class="tabular">${formatRp(m.costPrice)}</td><td class="text-zinc-400">${esc(m.poNumber||'—')}</td></tr>`).join('')||'<tr><td colspan="5" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
+    head.innerHTML='<tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Tanggal</th><th class="pb-2">PO</th><th class="pb-2">Supplier</th><th class="pb-2">Deskripsi</th><th class="pb-2">Qty</th><th class="pb-2">Harga Modal</th></tr>';
+    body.innerHTML=allStockMoves.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(m=>`<tr class="border-b border-zinc-800/50"><td class="py-2 text-xs">${formatDateTime(m.createdAt)}</td><td class="text-xs">${esc(m.poNumber||'—')}</td><td class="text-xs text-zinc-400">${esc(m.supplierName||'—')}</td><td class="text-xs">${esc(m.description)}</td><td class="text-xs">${m.qty}</td><td class="text-xs tabular">${formatRp(m.costPrice)}</td></tr>`).join('')||'<tr><td colspan="6" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
   } else {
     head.innerHTML='<tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Tanggal</th><th class="pb-2">Supplier</th><th class="pb-2">PO</th><th class="pb-2">Jumlah</th><th class="pb-2">Metode</th></tr>';
-    body.innerHTML=allPayments.map(p=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${formatDate(p.createdAt)}</td><td>${esc(p.supplierName)}</td><td class="text-zinc-400">${esc(p.poNumber||'—')}</td><td class="text-emerald-400 tabular">${formatRp(p.amount)}</td><td>${esc(p.method||'Tunai')}</td></tr>`).join('')||'<tr><td colspan="5" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
+    body.innerHTML=allPayments.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>`<tr class="border-b border-zinc-800/50"><td class="py-2 text-xs">${formatDateTime(p.createdAt)}</td><td>${esc(p.supplierName)}</td><td class="text-zinc-400 text-xs">${esc(p.poNumber||'—')}</td><td class="text-emerald-400 tabular">${formatRp(p.amount)}</td><td>${esc(p.method||'Tunai')}</td></tr>`).join('')||'<tr><td colspan="5" class="py-4 text-center text-zinc-600">Kosong</td></tr>';
   }
 }
 
 // ============================================================
 // REPORTS
 // ============================================================
-function setDefaultDates(){
-  const now=new Date();
-  const first=new Date(now.getFullYear(),now.getMonth(),1);
-  document.getElementById('report-from').value=first.toISOString().split('T')[0];
-  document.getElementById('report-to').value=now.toISOString().split('T')[0];
-}
+function setDefaultDates(){const n=new Date(),f=new Date(n.getFullYear(),n.getMonth(),1);document.getElementById('report-from').value=f.toISOString().split('T')[0];document.getElementById('report-to').value=n.toISOString().split('T')[0]}
 
 function generateReport(){
-  const from=new Date(document.getElementById('report-from').value);
-  const to=new Date(document.getElementById('report-to').value);to.setHours(23,59,59,999);
+  const from=new Date(document.getElementById('report-from').value),to=new Date(document.getElementById('report-to').value);to.setHours(23,59,59,999);
   if(isNaN(from)||isNaN(to)){showToast('Input tanggal valid');return}
-
-  reportData=allPOs.filter(p=>{
-    const d=p.createdAt&&p.createdAt.toDate?p.createdAt.toDate():p.createdAt?new Date(p.createdAt):null;
-    return d&&d>=from&&d<=to;
-  });
-
-  const totalSpend=reportData.reduce((s,p)=>s+(p.totalAmount||0),0);
-  const totalPaid=reportData.reduce((s,p)=>s+(p.paidAmount||0),0);
-  const supplierBreak={};reportData.forEach(p=>{if(!supplierBreak[p.supplierName])supplierBreak[p.supplierName]=0;supplierBreak[p.supplierName]+=(p.totalAmount||0)});
-
+  reportData=allPOs.filter(p=>{const d=new Date(p.createdAt);return d>=from&&d<=to});
+  const total=reportData.reduce((s,p)=>s+(p.totalAmount||0),0),paid=reportData.reduce((s,p)=>s+(p.paidAmount||0),0);
+  const sb={};reportData.forEach(p=>{sb[p.supplierName]=(sb[p.supplierName]||0)+(p.totalAmount||0)});
   document.getElementById('report-output').innerHTML=`
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
       <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Total PO</div><div class="text-xl font-bold">${reportData.length}</div></div>
-      <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Total Belanja</div><div class="text-xl font-bold">${formatRp(totalSpend)}</div></div>
-      <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Total Dibayar</div><div class="text-xl font-bold text-emerald-400">${formatRp(totalPaid)}</div></div>
+      <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Total Belanja</div><div class="text-xl font-bold">${formatRp(total)}</div></div>
+      <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800"><div class="text-xs text-zinc-500">Dibayar</div><div class="text-xl font-bold text-emerald-400">${formatRp(paid)}</div></div>
     </div>
     <h4 class="font-semibold mb-2">Per Supplier</h4>
-    <div class="table-wrap">
-      <table class="w-full text-sm">
-        <thead><tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Supplier</th><th class="pb-2">Total Belanja</th></tr></thead>
-        <tbody>${Object.entries(supplierBreak).sort((a,b)=>b[1]-a[1]).map(([n,t])=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${esc(n)}</td><td class="tabular font-medium">${formatRp(t)}</td></tr>`).join('')}</tbody>
-      </table>
-    </div>
-  `;
-}
-
-function exportReportExcel(){
-  if(!reportData.length){showToast('Generate laporan dulu');return}
-  const rows=reportData.map(p=>({'No. PO':p.poNumber,'Supplier':p.supplierName,'Total':p.totalAmount,'Dibayar':p.paidAmount,'Status':p.status,'Tanggal':formatDate(p.createdAt)}));
-  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Laporan');
-  XLSX.writeFile(wb,'laporan-pembelian.xlsx');showToast('Excel diexport');
+    <div class="table-wrap"><table class="w-full text-sm"><thead><tr class="border-b border-zinc-800 text-zinc-400 text-left"><th class="pb-2">Supplier</th><th class="pb-2">Total</th></tr></thead><tbody>${Object.entries(sb).sort((a,b)=>b[1]-a[1]).map(([n,t])=>`<tr class="border-b border-zinc-800/50"><td class="py-2">${esc(n)}</td><td class="tabular font-medium">${formatRp(t)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 // ============================================================
-// MODAL UTIL
+// EXPORT — CSV / EXCEL / PDF
+// ============================================================
+function exportData(type,format){
+  let rows=[],cols=[],title='';
+  if(type==='suppliers'){title='Daftar Supplier';cols=['Nama','Kontak','Telepon','Alamat','Catatan'];rows=allSuppliers.map(s=>[s.name,s.contact||'',s.phone||'',s.address||'',s.notes||''])}
+  else if(type==='po'){title='Purchase Orders';cols=['No. PO','Supplier','Total','Dibayar','Sisa','Status','Tanggal'];rows=allPOs.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>[p.poNumber,p.supplierName,p.totalAmount||0,p.paidAmount||0,Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)),p.status,formatDate(p.createdAt)])}
+  else if(type==='receiving'){title='Penerimaan Barang';cols=['Tanggal','PO','Supplier','Deskripsi','Qty','Harga Modal'];rows=allStockMoves.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(m=>[formatDate(m.createdAt),m.poNumber||'',m.supplierName||'',m.description,m.qty,m.costPrice||0])}
+  else if(type==='payments'){title='Pembayaran';cols=['Tanggal','Supplier','PO','Jumlah','Metode','Catatan'];rows=allPayments.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>[formatDate(p.createdAt),p.supplierName,p.poNumber||'',p.amount,p.method||'',p.notes||''])}
+  else if(type==='history'){title='Riwayat';cols=['Tanggal','Jenis','Deskripsi','Jumlah'];rows=[...allPOs.map(p=>[formatDate(p.createdAt),'PO',p.poNumber+' - '+p.supplierName,p.totalAmount]),...allStockMoves.map(m=>[formatDate(m.createdAt),'Penerimaan',m.description+' x'+m.qty,m.costPrice]),...allPayments.map(p=>[formatDate(p.createdAt),'Pembayaran',p.poNumber+' - '+p.supplierName,p.amount])].sort((a,b)=>new Date(b[0])-new Date(a[0]))}
+
+  if(format==='csv')downloadCSV(cols,rows,title);
+  else if(format==='excel')downloadExcel(cols,rows,title);
+  else if(format==='pdf')downloadPDF(cols,rows,title);
+}
+
+function exportReport(format){
+  if(!reportData.length){showToast('Generate laporan dulu');return}
+  const cols=['No. PO','Supplier','Total','Dibayar','Status','Tanggal'];
+  const rows=reportData.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>[p.poNumber,p.supplierName,p.totalAmount||0,p.paidAmount||0,p.status,formatDate(p.createdAt)]);
+  if(format==='csv')downloadCSV(cols,rows,'Laporan Pembelian');
+  else if(format==='excel')downloadExcel(cols,rows,'Laporan Pembelian');
+  else if(format==='pdf')downloadPDF(cols,rows,'Laporan Pembelian');
+}
+
+function downloadCSV(cols,rows,title){
+  const bom='\uFEFF';
+  const csv=bom+cols.join(',')+'\n'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  dl(csv,title+'.csv','text/csv;charset=utf-8');
+}
+
+function downloadExcel(cols,rows,title){
+  const ws=XLSX.utils.aoa_to_sheet([cols,...rows]);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,title);
+  XLSX.writeFile(wb,title+'.xlsx');
+}
+
+function downloadPDF(cols,rows,title){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF('l','mm','a4');
+  doc.setFontSize(14);doc.text(title+' — '+STORE.name,14,15);
+  doc.setFontSize(9);doc.text('Dicetak: '+new Date().toLocaleDateString('id-ID'),14,22);
+  doc.autoTable({head:[cols],body:rows,startY:28,styles:{fontSize:8},headStyles:{fillColor:[16,185,129]},margin:{left:14,right:14}});
+  doc.save(title+'.pdf');
+}
+
+function dl(content,filename,type){
+  const b=new Blob([content],{type});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+}
+
+// ============================================================
+// BACKUP / RESTORE
+// ============================================================
+function exportBackup(){
+  const data={suppliers:allSuppliers,pos:allPOs,payments:allPayments,stockMoves:allStockMoves,exportedAt:new Date().toISOString()};
+  const json=JSON.stringify(data,null,2);
+  dl(json,'supplier-hub-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');
+  showToast('Backup diexport');
+}
+
+// ============================================================
+// MODAL
 // ============================================================
 function showModal(){document.getElementById('modal-overlay').classList.remove('hidden')}
 function hideModal(){document.getElementById('modal-overlay').classList.add('hidden');document.getElementById('modal-box').innerHTML=''}
@@ -901,9 +669,7 @@ function hideModal(){document.getElementById('modal-overlay').classList.add('hid
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded',()=>{
-  initFirebase();setupPullToRefresh();setDefaultDates();
-});
+loadAll();
 </script>
 </body>
 </html>

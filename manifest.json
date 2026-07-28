@@ -1,11 +1,11 @@
 {
-  "name": "POS Toko HP",
-  "short_name": "POS",
-  "description": "POS Enterprise — Toko HP, stok IMEI/SN, kasir scanner, laporan multi-period.",
+  "name": "Supplier Hub",
+  "short_name": "SupplierHub",
+  "description": "Manajemen Pembelian, PO, Penerimaan, Pembayaran Supplier",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "any",
   "background_color": "#0a0a0b",
   "theme_color": "#10b981",
+  "orientation": "any",
   "icons": []
 }
