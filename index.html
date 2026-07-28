@@ -427,7 +427,7 @@ function renderPOTable(){
   if(!allPOs.length){tb.innerHTML='<tr><td colspan="7" class="py-4 text-center text-zinc-600">Belum ada PO</td></tr>';return}
   tb.innerHTML=allPOs.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>{
     const rem=Math.max(0,(p.totalAmount||0)-(p.paidAmount||0));
-    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(p.poNumber)}</td><td class="py-3 text-zinc-400">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${p.items?p.items.length+' item':'—'}</td><td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${rem>0?'text-yellow-400':'text-emerald-400'}">${rem>0?'Sisa: '+formatRp(rem):'Lunas'}</span></td><td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td><td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td><td class="py-3 flex flex-wrap gap-1"><button onclick="printPO('${p.id}')" class="text-xs text-emerald-400 hover:text-emerald-300">Cetak</button>${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300">Kirim</button>`:''}${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-blue-400 hover:text-blue-300">Diterima</button>`:''}<button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`;
+    return`<tr class="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td class="py-3 font-medium">${esc(p.poNumber)}</td><td class="py-3 text-zinc-400">${esc(p.supplierName)}</td><td class="py-3 text-zinc-400 text-xs">${p.items?p.items.length+' item':'—'}</td><td class="py-3 tabular">${formatRp(p.totalAmount)}<br><span class="text-xs ${rem>0?'text-yellow-400':'text-emerald-400'}">${rem>0?'Sisa: '+formatRp(rem):'Lunas'}</span></td><td class="py-3"><span class="badge badge-${esc(p.status)}">${esc(p.status)}</span></td><td class="py-3 text-zinc-400 text-xs">${formatDate(p.createdAt)}</td><td class="py-3 flex flex-wrap gap-1"><button onclick="printPO('${p.id}')" class="text-xs text-emerald-400 hover:text-emerald-300">Cetak</button><button onclick="showEditPOModal('${p.id}')" class="text-xs text-blue-400 hover:text-blue-300">Edit</button>${p.status==='draft'?`<button onclick="updatePOStatus('${p.id}','sent')" class="text-xs text-yellow-400 hover:text-yellow-300">Kirim</button>`:''}${p.status==='sent'?`<button onclick="updatePOStatus('${p.id}','received')" class="text-xs text-blue-400 hover:text-blue-300">Diterima</button>`:''}<button onclick="deletePO('${p.id}')" class="text-xs text-red-400 hover:text-red-300">Hapus</button></td></tr>`;
   }).join('');
 }
 
@@ -441,10 +441,12 @@ function showCreatePOModal(){
   const opts=allSuppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Buat Purchase Order</h3>
-    <div>
-      <label class="block text-xs text-zinc-500 mb-1">Pilih Supplier *</label>
-      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih Supplier —</option>${opts}</select>
-      <textarea id="po-notes" placeholder="Catatan" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"></textarea>
+    <label class="block text-xs text-zinc-500 mb-1">Pilih Supplier *</label>
+    <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih Supplier —</option>${opts}</select>
+    <label class="block text-xs text-zinc-500 mb-1 mt-3">Tanggal PO</label>
+    <input type="date" id="po-date" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
+    <label class="block text-zinc-500 mb-1 mt-3">Catatan</label>
+    <textarea id="po-notes" placeholder="Catatan (opsional)" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"></textarea>
     </div>
     <h4 class="font-semibold mt-4 mb-2">Item</h4><div id="po-items-ct" class="space-y-2"></div>
     <button onclick="addPOItem()" class="text-sm text-emerald-400 hover:text-emerald-300 mt-2">+ Tambah Item</button>
@@ -461,12 +463,48 @@ function savePO(){
   const sid=document.getElementById('po-supplier').value;if(!sid){showToast('Pilih supplier');return}
   if(!poItems.length){showToast('Tambah item');return}
   const s=allSuppliers.find(x=>x.id===sid);
-  allPOs.push({id:genId(),poNumber:genPONumber(),supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],status:'draft',totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),paidAmount:0,notes:v('po-notes'),createdAt:new Date().toISOString()});
+  const poDate=document.getElementById('po-date').value||new Date().toISOString().split('T')[0];
+  allPOs.push({id:genId(),poNumber:genPONumber(),supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],status:'draft',totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),paidAmount:0,notes:v('po-notes'),createdAt:new Date(poDate+'T00:00:00').toISOString()});
   storeSet('pos',allPOs);hideModal();showToast('PO dibuat');renderPOTable();renderDashboard();
 }
 
 function updatePOStatus(id,status){if(!confirm('Ubah status?'))return;const i=allPOs.findIndex(x=>x.id===id);if(i<0)return;allPOs[i].status=status;storeSet('pos',allPOs);showToast('Status diupdate');renderPOTable();renderDashboard()}
 function deletePO(id){if(!confirm('Hapus PO?'))return;allPOs=allPOs.filter(x=>x.id!==id);storeSet('pos',allPOs);showToast('Dihapus');renderPOTable();renderDashboard()}
+
+// ============================================================
+// EDIT PO
+// ============================================================
+function showEditPOModal(id){
+  const po=allPOs.find(p=>p.id===id);if(!po)return;
+  const opts=allSuppliers.map(s=>`<option value="${s.id}" ${s.id===po.supplierId?'selected':''}>${esc(s.name)}</option>`).join('');
+  poItems=po.items?po.items.map(it=>({...it})):[];
+  const poDate=po.createdAt?new Date(po.createdAt).toISOString().split('T')[0]:new Date().toISOString().split('T')[0];
+  document.getElementById('modal-box').innerHTML=`
+    <h3 class="text-lg font-semibold mb-4">Edit PO — ${esc(po.poNumber)}</h3>
+    <div>
+      <label class="block text-xs text-zinc-500 mb-1">Supplier</label>
+      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih Supplier —</option>${opts}</select>
+      <label class="block text-xs text-zinc-500 mb-1 mt-3">Tanggal PO</label>
+      <input type="date" id="po-date" value="${poDate}" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
+      <label class="block text-xs text-zinc-500 mb-1 mt-3">Catatan</label>
+      <textarea id="po-notes" placeholder="Catatan (opsional)" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">${esc(po.notes||'')}</textarea>
+    </div>
+    <h4 class="font-semibold mt-4 mb-2">Item</h4><div id="po-items-ct" class="space-y-2"></div>
+    <button onclick="addPOItem()" class="text-sm text-emerald-400 hover:text-emerald-300 mt-2">+ Tambah Item</button>
+    <div class="flex gap-2 mt-4"><button onclick="updatePO('${id}')" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Update PO</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
+  renderPOItems();showModal();
+}
+
+function updatePO(id){
+  const i=allPOs.findIndex(p=>p.id===id);if(i<0)return;
+  const sid=document.getElementById('po-supplier').value;if(!sid){showToast('Pilih supplier');return}
+  if(!poItems.length){showToast('Tambah minimal 1 item');return}
+  const s=allSuppliers.find(x=>x.id===sid);
+  const poDate=document.getElementById('po-date').value||new Date().toISOString().split('T')[0];
+  allPOs[i]={...allPOs[i],supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),notes:v('po-notes'),createdAt:new Date(poDate+'T00:00:00').toISOString()};
+  storeSet('pos',allPOs);hideModal();showToast('PO diupdate');renderPOTable();renderDashboard();
+}
+
 // ============================================================
 // NOTA / RECEIPT
 // ============================================================
