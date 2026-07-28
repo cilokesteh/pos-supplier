@@ -622,59 +622,89 @@ function printPO(id){
 function downloadNotaPDF(id){
   const po=allPOs.find(p=>p.id===id);if(!po){showToast('PO tidak ditemukan');return}
   const{jsPDF}=window.jspdf;
-  const doc=new jsPDF('p','mm',[80,200]);
+  const doc=new jsPDF('p','mm',[80,297]);
   const items=po.items||[];
   const subtotal=po.totalAmount||0;
   const paid=po.paidAmount||0;
   const remaining=Math.max(0,subtotal-paid);
-  let y=8;
-  // Header
-  doc.setFontSize(14);doc.setFont(undefined,'bold');doc.text(STORE.name,40,y,{align:'center'});y+=5;
-  doc.setFontSize(8);doc.setFont(undefined,'normal');doc.text(STORE.address,40,y,{align:'center'});y+=4;
-  doc.text('Telp: '+STORE.phone+' | WA: '+STORE.wa,40,y,{align:'center'});y+=5;
-  doc.setDrawColor(0);doc.setLineDashPattern([2,2],0);doc.line(5,y,75,y);y+=5;
-  // Title
-  doc.setFontSize(11);doc.setFont(undefined,'bold');doc.text('NOTA PEMBELIAN',40,y,{align:'center'});y+=7;
-  // Info
-  doc.setFontSize(8);doc.setFont(undefined,'normal');
-  doc.text('No. PO: '+po.poNumber,5,y);doc.text('Tanggal: '+formatDate(po.createdAt),55,y);y+=4;
-  doc.text('Kepada: '+(po.supplierName||'—'),5,y);doc.text('Status: '+po.status.toUpperCase(),55,y);y+=6;
-  // Table header
-  doc.setFont(undefined,'bold');doc.line(5,y,75,y);y+=4;
-  doc.text('NO',5,y);doc.text('QTY',12,y);doc.text('DESKRIPSI',20,y);doc.text('HARGA',50,y,{align:'right'});doc.text('TOTAL',73,y,{align:'right'});y+=4;
-  doc.line(5,y,75,y);y+=3;
-  // Items
+  const W=80,M=5;
+  const d=new Date(po.createdAt);
+  const tgl=d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  let y=6;
+
+  function center(t,yy){doc.text(t,W/2,yy,{align:'center'})}
+  function right(t,yy){doc.text(t,W-M,yy,{align:'right'})}
+  function hr(yy){doc.line(M,yy,W-M,yy)}
+  function dashHr(yy){doc.setLineDashPattern([1,1],0);doc.line(M,yy,W-M,yy);doc.setLineDashPattern([],0)}
+  function trunc(t,n){return t.length>n?t.substring(0,n-1)+'…':t}
+
+  // HEADER
+  doc.setFontSize(16);doc.setFont(undefined,'bold');
+  center(STORE.name,y);y+=5;
+  doc.setFontSize(7);doc.setFont(undefined,'normal');
+  center(trunc(STORE.address,55),y);y+=3;
+  center('Telp: '+STORE.phone+' | WA: '+STORE.wa,y);y+=4;
+  hr(y);y+=4;
+
+  // TITLE
+  doc.setFontSize(12);doc.setFont(undefined,'bold');
+  center('NOTA PEMBELIAN',y);y+=6;
+
+  // INFO
+  doc.setFontSize(8);
+  doc.setFont(undefined,'bold');doc.text('No. PO',M,y);doc.setFont(undefined,'normal');doc.text(': '+po.poNumber,M+20,y);y+=4;
+  doc.setFont(undefined,'bold');doc.text('Tanggal',M,y);doc.setFont(undefined,'normal');doc.text(': '+tgl,M+20,y);
+  doc.setFont(undefined,'bold');doc.text('Kepada',W/2+2,y);doc.setFont(undefined,'normal');doc.text(': '+(po.supplierName||'—'),W/2+18,y);y+=4;
+  doc.setFont(undefined,'bold');doc.text('Status',M,y);doc.setFont(undefined,'normal');doc.text(': '+po.status.toUpperCase(),M+20,y);y+=4;
+  dashHr(y);y+=4;
+
+  // TABLE HEADER
+  doc.setFont(undefined,'bold');doc.setFontSize(7);
+  doc.text('No',M+2,y);doc.text('Qty',M+10,y);doc.text('Deskripsi Barang',M+18,y);
+  doc.text('Harga',W-M-30,y);doc.text('Total',W-M,y);y+=3;
+  hr(y);y+=3;
+
+  // ITEMS
   doc.setFont(undefined,'normal');
   items.forEach((it,i)=>{
-    doc.text(String(i+1),5,y);doc.text(String(it.qty),14,y);
-    const desc=it.description||'—';doc.text(desc.substring(0,25),20,y);
-    doc.text(formatRp(it.costPrice),50,y,{align:'right'});
-    doc.text(formatRp(it.qty*it.costPrice),73,y,{align:'right'});
-    y+=4;
+    doc.text(String(i+1),M+3,y);doc.text(String(it.qty),M+11,y);
+    doc.text(trunc(it.description||'—',26),M+18,y);
+    doc.text(formatRp(it.costPrice),W-M-30,y);
+    doc.text(formatRp(it.qty*it.costPrice),W-M,y);y+=4;
   });
-  if(items.length===0){doc.text('— Tidak ada item —',40,y,{align:'center'});y+=4}
-  y+=2;doc.line(5,y,75,y);y+=5;
-  // Totals
-  doc.setFont(undefined,'bold');
-  doc.text('Subtotal:',20,y);doc.text(formatRp(subtotal),73,y,{align:'right'});y+=5;
-  doc.setFontSize(10);doc.text('TOTAL:',20,y);doc.text(formatRp(subtotal),73,y,{align:'right'});y+=7;
-  // Payment
+  if(!items.length){center('— Tidak ada item —',y);y+=4}
+  y+=1;hr(y);y+=4;
+
+  // TOTALS
   doc.setFontSize(8);doc.setFont(undefined,'normal');
-  doc.text('Dibayar:',20,y);doc.text(formatRp(paid),73,y,{align:'right'});y+=5;
-  doc.setFont(undefined,'bold');doc.text('Sisa:',20,y);doc.text(formatRp(remaining),73,y,{align:'right'});y+=7;
-  // Footer
-  doc.setLineDashPattern([2,2],0);doc.line(5,y,75,y);y+=5;
+  doc.text('Subtotal',M+20,y);right(formatRp(subtotal),y);y+=5;
+  doc.setFont(undefined,'bold');doc.setFontSize(10);
+  doc.text('TOTAL',M+20,y);right(formatRp(subtotal),y);y+=6;
+
+  // PAYMENT
+  dashHr(y);y+=3;
+  doc.setFontSize(8);doc.setFont(undefined,'normal');
+  doc.text('Dibayar',M+20,y);right(formatRp(paid),y);y+=4;
+  doc.setFont(undefined,'bold');doc.text('Sisa Bayar',M+20,y);right(formatRp(remaining),y);y+=3;
+  dashHr(y);y+=5;
+
+  // NOTES
+  if(po.notes){doc.setFontSize(7);doc.setFont(undefined,'normal');doc.text('Catatan: '+trunc(po.notes,55),M,y);y+=5}
+
+  // FOOTER
+  dashHr(y);y+=4;
   doc.setFontSize(7);doc.setFont(undefined,'normal');
-  doc.text(STORE.footer||'Terima kasih',40,y,{align:'center'});y+=4;
-  doc.text(STORE.name+' © '+new Date().getFullYear(),40,y,{align:'center'});y+=10;
-  // Signatures
-  doc.line(5,y,30,y);doc.line(50,y,75,y);y+=4;
-  doc.text('Penerima',17,y,{align:'center'});doc.text('Penanggung Jawab',62,y,{align:'center'});
+  center('Terima kasih atas kerjasamanya',y);y+=3;
+  center(STORE.name+' © '+new Date().getFullYear(),y);y+=12;
+
+  // SIGNATURES
+  doc.setFontSize(7);
+  doc.line(M,y,M+25,y);doc.line(W-M-25,y,W-M,y);y+=3;
+  center('Penerima',M+12.5);center('Penanggung Jawab',W-M-12.5);
+
   doc.save('Nota-'+po.poNumber+'.pdf');
 }
 
-
-// ============================================================
 // RECEIVING
 // ============================================================
 function searchStock(){
