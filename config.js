@@ -6,15 +6,15 @@
 
 // --- Store identity ---
 const STORE = {
-  name:    'ANSTORE',
-  address: 'Jl. Widuri III No.B17, Bangetayu Kulon, Kec. Genuk, Kota Semarang, Jawa Tengah 50115',
-  phone:   '089501407229',
+  name:    'Toko HP',
+  address: 'Jl. Contoh No. 1, Kota',
+  phone:   '0812-0000-0000',
   hours:   'Senin - Sabtu: 08.00 - 17.00',
-  wa:      '089501407229',
-  instagram: '@anstore',
-  facebook:  'ANSTORE Official',
-  tiktok:    '@anstore',
-  website:   'www.anstore.id',
+  wa:      '0812-0000-0000',
+  instagram: '@tokohp',
+  facebook:  'Toko HP Official',
+  tiktok:    '@tokohp',
+  website:   'www.tokohp.com',
   footer:  'Terima kasih atas kerjasamanya'
 };
 
