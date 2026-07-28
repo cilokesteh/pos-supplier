@@ -433,11 +433,17 @@ function renderPOTable(){
 
 function showCreatePOModal(){
   poItems=[{description:'',qty:1,costPrice:0}];
+  if(!allSuppliers.length){
+    showToast('Tambah supplier dulu lewat menu Supplier');
+    switchView('suppliers');
+    return;
+  }
   const opts=allSuppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Buat Purchase Order</h3>
-    <div class="space-y-3">
-      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih Supplier</option>${opts}</select>
+    <div>
+      <label class="block text-xs text-zinc-500 mb-1">Pilih Supplier *</label>
+      <select id="po-supplier" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih Supplier —</option>${opts}</select>
       <textarea id="po-notes" placeholder="Catatan" rows="2" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"></textarea>
     </div>
     <h4 class="font-semibold mt-4 mb-2">Item</h4><div id="po-items-ct" class="space-y-2"></div>
@@ -636,12 +642,13 @@ function renderReceivingTable(){
 
 function showReceiveModal(){
   const pending=allPOs.filter(p=>p.status==='sent');
-  if(!pending.length){showToast('Tidak ada PO yang perlu diterima');return}
+  if(!pending.length){showToast('Tidak ada PO dengan status "sent" untuk diterima');return}
   const opts=pending.map(p=>`<option value="${p.id}">${esc(p.poNumber)} - ${esc(p.supplierName)} (${p.items?p.items.length:'0'} item)</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Terima Barang dari PO</h3>
-    <div class="space-y-3">
-      <select id="recv-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih PO</option>${opts}</select>
+    <div>
+      <label class="block text-xs text-zinc-500 mb-1">Pilih PO *</label>
+      <select id="recv-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih PO —</option>${opts}</select>
       <div id="recv-po-items"></div>
     </div>
     <div class="flex gap-2 mt-4"><button onclick="processReceiving()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Konfirmasi Terima</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
@@ -685,10 +692,12 @@ function showPayModal(){
   const opts=unpaid.map(p=>`<option value="${p.id}">${esc(p.poNumber)} - ${esc(p.supplierName)} (Sisa: ${formatRp(Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)))})</option>`).join('');
   document.getElementById('modal-box').innerHTML=`
     <h3 class="text-lg font-semibold mb-4">Bayar ke Supplier</h3>
-    <div class="space-y-3">
-      <select id="pay-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option value="">Pilih PO</option>${opts}</select>
+    <div>
+      <label class="block text-xs text-zinc-500 mb-1">Pilih PO *</label>
+      <select id="pay-po" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option value="">— Pilih PO —</option>${opts}</select>
       <input id="pay-amount" type="number" placeholder="Jumlah Bayar" min="0" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
-      <select id="pay-method" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100"><option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option><option>Lainnya</option></select>
+      <label class="block text-xs text-zinc-500 mb-1 mt-3">Metode Bayar</label>
+      <select id="pay-method" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100" style="min-height:48px;-webkit-appearance:menulist"><option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option><option>Lainnya</option></select>
       <input id="pay-notes" placeholder="Catatan" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-emerald-500 focus:outline-none text-zinc-100">
     </div>
     <div class="flex gap-2 mt-4"><button onclick="processPayment()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-semibold text-white">Bayar</button><button onclick="hideModal()" class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-300">Batal</button></div>`;
