@@ -295,7 +295,7 @@ let reportData=[];
 function storeGet(k){try{return JSON.parse(localStorage.getItem('sh_'+k))||[]}catch(e){return[]}}
 function storeSet(k,v){localStorage.setItem('sh_'+k,JSON.stringify(v))}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
-function genPONumber(){const d=new Date(),y=String(d.getFullYear()).slice(-2),m=String(d.getMonth()+1).padStart(2,'0'),s=String(Math.floor(Math.random()*9000)+1000);return'PO'+y+m+'-'+s}
+function genPONumber(dateStr){const d=dateStr?new Date(dateStr+'T00:00:00'):new Date(),y=String(d.getFullYear()).slice(-2),m=String(d.getMonth()+1).padStart(2,'0'),s=String(Math.floor(Math.random()*9000)+1000);return'PO'+y+m+'-'+s}
 
 // === XSS ===
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
@@ -464,7 +464,7 @@ function savePO(){
   if(!poItems.length){showToast('Tambah item');return}
   const s=allSuppliers.find(x=>x.id===sid);
   const poDate=document.getElementById('po-date').value||new Date().toISOString().split('T')[0];
-  allPOs.push({id:genId(),poNumber:genPONumber(),supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],status:'draft',totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),paidAmount:0,notes:v('po-notes'),createdAt:new Date(poDate+'T00:00:00').toISOString()});
+  allPOs.push({id:genId(),poNumber:genPONumber(poDate),supplierId:sid,supplierName:s?s.name:'—',items:[...poItems.map(it=>({...it}))],status:'draft',totalAmount:poItems.reduce((a,it)=>a+it.qty*it.costPrice,0),paidAmount:0,notes:v('po-notes'),createdAt:new Date(poDate+'T00:00:00').toISOString()});
   storeSet('pos',allPOs);hideModal();showToast('PO dibuat');renderPOTable();renderDashboard();
 }
 
