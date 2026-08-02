@@ -11,6 +11,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="config.js"></script>
 <script src="pwa.js"></script>
 <style>
@@ -82,7 +85,8 @@ header{padding-top:env(safe-area-inset-top)}
       <label class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs flex items-center justify-center cursor-pointer">⬆ Restore
         <input type="file" accept=".json" class="hidden" onchange="importBackup(event)">
       </label>
-      <div class="text-[10px] text-zinc-600 text-center">v2.1 supplier • ciloktech.my.id</div>
+      <div class="text-[10px] text-zinc-600 text-center">v2.2 cloud • ciloktech.my.id</div>
+      <div id="sync-badge" class="w-full py-1.5 rounded-lg text-center text-[10px] font-medium bg-zinc-900 border border-zinc-800 text-zinc-500">⏳ menyambungkan database…</div>
     </div>
   </aside>
 
@@ -326,13 +330,62 @@ function migrateV1(){
     localStorage.setItem('as_migrated','1');
   }
 }
+// ============ FIREBASE CLOUD SYNC ============
+let fdb=null, fauth=null, fuser=null;
+function initFirebase(){
+  if(fdb) return true;
+  if(typeof firebase==='undefined') return false;
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    fdb=firebase.firestore();
+    fauth=firebase.auth();
+    fauth.signInAnonymously().then(u=>{fuser=u.user; syncBadge('local'); cloudPull();}).catch(e=>{syncBadge('err','auth: '+e.message)});
+    return true;
+  }catch(e){ console.error('fb init',e); return false; }
+}
+function syncBadge(state,msg){
+  const el=document.getElementById('sync-badge'); if(!el)return;
+  if(state==='ok'){el.textContent='☁ tersimpan di database'; el.className='w-full py-1.5 rounded-lg text-center text-[10px] font-medium bg-emerald-950/50 border border-emerald-900/50 text-emerald-400';}
+  else if(state==='local'){el.textContent='☁ online — sinkronisasi…'; el.className='w-full py-1.5 rounded-lg text-center text-[10px] font-medium bg-zinc-900 border border-zinc-800 text-zinc-400';}
+  else if(state==='err'){el.textContent='⚠ '+msg; el.className='w-full py-1.5 rounded-lg text-center text-[10px] font-medium bg-red-950/50 border border-red-900/50 text-red-400';}
+  else {el.textContent='☁ offline — tersimpan lokal'; el.className='w-full py-1.5 rounded-lg text-center text-[10px] font-medium bg-yellow-950/50 border border-yellow-900/50 text-yellow-400';}
+}
+function cloudPull(){
+  if(!fdb||!fuser)return;
+  Promise.all(Object.values(COLLECTIONS).map(c=>fdb.collection(c).get().then(s=>s.docs.map(d=>d.data().items||[])).catch(()=>null)))
+    .then(([cust,prod,ord,ship,pay])=>{
+      let changed=false;
+      if(cust&&cust.length){customers=cust;changed=true;}
+      if(prod&&prod.length){products=prod;changed=true;}
+      if(ord&&ord.length){orders=ord;changed=true;}
+      if(ship&&ship.length){shippings=ship;changed=true;}
+      if(pay&&pay.length){payments=pay;changed=true;}
+      // kalau cloud kosong tapi lokal ada isi → seed cloud (first run)
+      const localEmpty = !customers.length&&!products.length&&!orders.length&&!shippings.length&&!payments.length;
+      if(!localEmpty){ cloudPush(); }
+      if(changed){ ss('customers',customers); ss('products',products); ss('orders',orders); ss('shippings',shippings); ss('payments',payments); rdash(); rcust(); rprod(); rord(); rship(); rpay(); }
+      syncBadge('ok');
+    }).catch(()=>syncBadge('off'));
+}
+function cloudPush(){
+  if(!fdb||!fuser)return;
+  const sets=Object.entries({customers,products,orders,shippings,payments}).map(([k,arr])=>{
+    const col=fdb.collection(COLLECTIONS[k]);
+    return col.doc('all').set({items:arr, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  });
+  Promise.all(sets).then(()=>syncBadge('ok')).catch(()=>syncBadge('off'));
+}
+// ponytail: last-write-wins per collection (doc 'all'). Upgrade ke per-record doc kalau multi-device concurrent.
+
 function loadAll(){
   migrateV1();
   customers=sg('customers'); products=sg('products'); orders=sg('orders'); shippings=sg('shippings'); payments=sg('payments');
   rdash(); rcust(); rprod(); rord(); rship(); rpay();
+  if(!initFirebase()){ syncBadge('off'); }
 }
 function saveAll(){
   ss('customers',customers); ss('products',products); ss('orders',orders); ss('shippings',shippings); ss('payments',payments);
+  cloudPush();
 }
 
 // nav

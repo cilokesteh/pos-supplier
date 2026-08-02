@@ -1,5 +1,22 @@
 /* Copyright © 2019 ANSTORE | All Rights Reserved | Proprietary */
 
+const FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyAlBo62JwrIKyIZahBgYRYYuIo48bI623s',
+  authDomain:        'pos-enterprise-9dde0.firebaseapp.com',
+  projectId:         'pos-enterprise-9dde0',
+  storageBucket:     'pos-enterprise-9dde0.firebasestorage.app',
+  messagingSenderId: '468231563907',
+  appId:             '1:468231563907:web:ea437b138d7e868b66c9b6'
+};
+
+const COLLECTIONS = {
+  customers: 'ans-customers',
+  products:  'ans-products',
+  orders:    'ans-orders',
+  shippings: 'ans-shippings',
+  payments:  'ans-payments'
+};
+
 const STORE = {
   name:    'ANSTORE',
   tagline: 'Supplier & Grosir HP — Amanah • Terpercaya • Sejak 2019',
