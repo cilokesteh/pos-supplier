@@ -1,7 +1,7 @@
 /* Copyright © 2019 ANSTORE | All Rights Reserved | Proprietary */
 
 // sw.js — service worker
-const CACHE = 'anstore-supplier-v2019-2';
+const CACHE = 'anstore-supplier-v2019-3';
 const ASSETS = [
   './',
   './index.html',

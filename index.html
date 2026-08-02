@@ -82,7 +82,7 @@ header{padding-top:env(safe-area-inset-top)}
       <label class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs flex items-center justify-center cursor-pointer">⬆ Restore
         <input type="file" accept=".json" class="hidden" onchange="importBackup(event)">
       </label>
-      <div class="text-[10px] text-zinc-600 text-center">v2.0 supplier • ciloktech.my.id</div>
+      <div class="text-[10px] text-zinc-600 text-center">v2.1 supplier • ciloktech.my.id</div>
     </div>
   </aside>
 
@@ -765,6 +765,24 @@ function showModal(){document.getElementById('modal-ov').classList.remove('hidde
 function hideModal(){document.getElementById('modal-ov').classList.add('hidden'); document.getElementById('modal-box').innerHTML='';}
 
 loadAll();
+
+// === DIAGNOSTIC (?diag) ===
+if(location.search.includes('diag')){
+  const keys=[]; for(let i=0;i<localStorage.length;i++)keys.push(localStorage.key(i));
+  const info={
+    origin:location.origin,
+    url:location.href,
+    keys,
+    as_migrated:localStorage.getItem('as_migrated'),
+    customers:customers.length, products:products.length, orders:orders.length, shippings:shippings.length, payments:payments.length,
+    raw:{}
+  };
+  keys.forEach(k=>{try{const v=JSON.parse(localStorage.getItem(k)); info.raw[k]=Array.isArray(v)?v.length:typeof v==='object'?(Object.keys(v).length+' keys'):String(v).slice(0,40)}catch(e){info.raw[k]='(unparseable)'}});
+  const pre=document.createElement('pre');
+  pre.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#0a0a0a;color:#4ade80;font:11px monospace;padding:12px;overflow:auto;white-space:pre-wrap';
+  pre.textContent=JSON.stringify(info,null,2);
+  document.body.appendChild(pre);
+}
 </script>
 </body>
 </html>
