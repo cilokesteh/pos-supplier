@@ -1,4 +1,4 @@
-<!-- Copyright © 2019 ANSTORE | All Rights Reserved | Proprietary -->
+<!-- Copyright © 2026 CilokTech (ciloktech.my.id) | Proprietary -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -82,7 +82,7 @@ header{padding-top:env(safe-area-inset-top)}
       <label class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs flex items-center justify-center cursor-pointer">⬆ Restore
         <input type="file" accept=".json" class="hidden" onchange="importBackup(event)">
       </label>
-      <div class="text-[10px] text-zinc-600 text-center">© 2019 ANSTORE • Supplier Grosir HP</div>
+      <div class="text-[10px] text-zinc-600 text-center">v2.0 supplier • ciloktech.my.id</div>
     </div>
   </aside>
 
@@ -264,7 +264,70 @@ function fdt(iso){if(!iso)return '—';return new Date(iso).toLocaleString('id-I
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.remove('hidden');t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.classList.add('hidden'),300)},3000)}
 function v(id){return (document.getElementById(id)||{}).value||''}
 
+function migrateV1(){
+  // v1 (toko mode) used sh_ prefix with different schema
+  // v2 (supplier mode) uses as_ prefix
+  // Map: sh_suppliers→customers, sh_pos→orders, sh_payments→payments
+  if(localStorage.getItem('as_migrated'))return;
+  const hasV1=localStorage.getItem('sh_pos')||localStorage.getItem('sh_suppliers');
+  if(!hasV1)return;
+  let migrated=0;
+  // sh_suppliers → customers (phone→wa)
+  try{
+    const v1sup=JSON.parse(localStorage.getItem('sh_suppliers')||'[]');
+    if(v1sup.length && !customers.length){
+      customers=v1sup.map(s=>({id:s.id||gid(),name:s.name||'',contact:s.contact||'',wa:s.phone||'',address:s.address||'',notes:s.notes||'',createdAt:s.createdAt||new Date().toISOString()}));
+      migrated+=customers.length;
+    }
+  }catch(e){}
+  // sh_pos → orders (poNumber→number, supplierId→customerId, totalAmount→total, paidAmount→paid)
+  try{
+    const v1pos=JSON.parse(localStorage.getItem('sh_pos')||'[]');
+    if(v1pos.length && !orders.length){
+      const stMap={draft:'new',sent:'process',received:'done',cancel:'cancel'};
+      orders=v1pos.map(p=>({
+        id:p.id||gid(),
+        number:p.poNumber||genNo('ORD'),
+        customerId:p.supplierId||'',
+        customerName:p.supplierName||'—',
+        items:(p.items||[]).map(it=>({productId:'',name:it.description||it.name||'—',qty:it.qty||1,price:it.costPrice||0})),
+        total:p.totalAmount||0,
+        paid:p.paidAmount||0,
+        status:stMap[p.status]||'new',
+        notes:p.notes||'',
+        createdAt:p.createdAt||new Date().toISOString()
+      }));
+      migrated+=orders.length;
+    }
+  }catch(e){}
+  // sh_payments → payments (poId→orderId, poNumber→orderNumber, supplierName→customerName)
+  try{
+    const v1pay=JSON.parse(localStorage.getItem('sh_payments')||'[]');
+    if(v1pay.length && !payments.length){
+      payments=v1pay.map(p=>({
+        id:p.id||gid(),
+        orderId:p.poId||'',
+        orderNumber:p.poNumber||'',
+        customerName:p.supplierName||'—',
+        amount:p.amount||0,
+        method:p.method||'Tunai',
+        notes:p.notes||'',
+        createdAt:p.createdAt||new Date().toISOString()
+      }));
+      migrated+=payments.length;
+    }
+  }catch(e){}
+  if(migrated>0){
+    saveAll();
+    localStorage.setItem('as_migrated','1');
+    console.log('Migrated '+migrated+' records from v1 (sh_) → v2 (as_)');
+    setTimeout(()=>toast(migrated+' data lama dipulihkan'),500);
+  }else{
+    localStorage.setItem('as_migrated','1');
+  }
+}
 function loadAll(){
+  migrateV1();
   customers=sg('customers'); products=sg('products'); orders=sg('orders'); shippings=sg('shippings'); payments=sg('payments');
   rdash(); rcust(); rprod(); rord(); rship(); rpay();
 }
@@ -478,6 +541,7 @@ function saveOrder(){
   if(!curItems.length || curItems.every(it=>!it.productId)){toast('Isi minimal 1 produk');return}
   const valid=curItems.filter(it=>it.productId);
   if(!valid.length){toast('Pilih produk valid');return}
+  // stok check warn
   for(const it of valid){
     const p=products.find(x=>x.id===it.productId);
     if(p && (p.stock||0) < it.qty){ if(!confirm(`Stok ${p.name} cuma ${p.stock}, lanjut?`))return }
@@ -542,25 +606,25 @@ function buildNotaHTML(o){
   .footer{display:flex;justify-content:space-between;margin-top:15px;border-top:2px dashed #000;padding-top:8px}
   .sign{width:22%;text-align:center;font-size:9px}.sign-line{border-top:1px solid #000;margin-top:40px;padding-top:3px}
   </style></head><body><div class="page"><div class="no-print" style="text-align:center;margin:8px"><button onclick="window.print()" style="padding:8px 24px;border:1px solid #333;background:#fff;cursor:pointer;border-radius:4px">🖨 Cetak</button><button onclick="window.close()" style="padding:8px 24px;margin-left:8px;border:1px solid #333;background:#fff;cursor:pointer;border-radius:4px">✕ Tutup</button></div>
-  <div class="header"><div><h1>${esc(STORE.name)}</h1><p>${esc(STORE.address)}</p><p>Telp/WA: ${esc(STORE.phone)} | ${esc(STORE.website||'')}</p><p style="font-size:10px;color:#059669;font-weight:700;margin-top:2px">${esc(STORE.tagline||'')}</p></div><div style="text-align:right"><div class="badge">NOTA PENJUALAN</div><p style="font-size:9px;margin-top:4px;color:#666">Supplier Grosir HP</p><p style="font-size:8px;margin-top:4px;color:#999">© 2019 ANSTORE</p></div></div>
+  <div class="header"><div><h1>${esc(STORE.name)}</h1><p>${esc(STORE.address)}</p><p>Telp/WA: ${esc(STORE.phone)} | ${esc(STORE.website||'')}</p><p style="font-size:10px;color:#059669;font-weight:700;margin-top:2px">${esc(STORE.tagline||'')}</p></div><div style="text-align:right"><div class="badge">NOTA PENJUALAN</div><p style="font-size:9px;margin-top:4px;color:#666">Supplier Grosir HP</p></div></div>
   <div class="info"><div class="info"><div><div class="lbl">No. Pesanan</div><div class="val" style="font-size:13px">${esc(o.number)}</div></div><div><div class="lbl">Tanggal</div><div class="val">${tgl} ${jam}</div></div><div><div class="lbl">Pelanggan (Toko)</div><div class="val" style="font-size:13px">${esc(custName)}</div><div style="font-size:9px;color:#555">${esc(cust?.address||'')}</div><div style="font-size:9px;color:#555">${esc(cust?.wa||'')}</div></div><div><div class="lbl">Status</div><div class="val">${esc(o.status.toUpperCase())}</div></div></div></div>
   <table><thead><tr><th class="c">No</th><th class="c">Qty</th><th>Produk</th><th class="r">Harga</th><th class="r">Subtotal</th></tr></thead><tbody>${items.map((it,i)=>`<tr><td class="c">${i+1}</td><td class="c">${it.qty}</td><td>${esc(it.name||'—')}</td><td class="r">${rp(it.price)}</td><td class="r" style="font-weight:700">${rp(it.qty*it.price)}</td></tr>`).join('')}${!items.length?'<tr><td colspan="5" style="text-align:center;padding:15px;color:#999">—</td></tr>':''}</tbody><tfoot><tr><td colspan="3"></td><td class="r" style="font-weight:600">Subtotal</td><td class="r" style="font-weight:600">${rp(sub)}</td></tr><tr class="total"><td colspan="3"></td><td class="r">TOTAL</td><td class="r">${rp(sub)}</td></tr></tfoot></table>
   <div class="bottom"><div class="pay"><b style="font-size:10px;color:#666;text-transform:uppercase">Pembayaran</b><div style="display:flex;justify-content:space-between;margin-top:4px"><span>Terbayar</span><span>${rp(paid)}</span></div><div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;border-top:1px solid #ccc;margin-top:4px;padding-top:4px;color:${sisa>0?'#dc2626':'#16a34a'}"><span>Sisa</span><span>${rp(sisa)}</span></div></div>${o.notes?`<div style="flex:1;padding:8px;border-left:3px solid #ccc;font-size:9px"><b>Catatan:</b> ${esc(o.notes)}</div>`:''}</div>
-  <div class="footer"><div><div style="font-weight:600">Terima kasih 🙏 ${esc(custName)}</div><div style="font-size:8px;color:#999">© 2019 ANSTORE — ${esc(STORE.footer||'')}</div></div><div style="display:flex;gap:15px"><div class="sign"><div class="sign-line">Penerima</div></div><div class="sign"><div class="sign-line">ANSTORE © 2019</div></div></div></div></div></body></html>`;
+  <div class="footer"><div><div style="font-weight:600">Terima kasih 🙏 ${esc(custName)}</div><div style="font-size:8px;color:#999">${esc(STORE.name)} © ${new Date().getFullYear()} — ${esc(STORE.footer||'')}</div></div><div style="display:flex;gap:15px"><div class="sign"><div class="sign-line">Penerima</div></div><div class="sign"><div class="sign-line">ANSTORE</div></div></div></div></div></body></html>`;
 }
 function printNota(id){ const o=orders.find(x=>x.id===id); if(!o){toast('Tidak ketemu');return} const html=buildNotaHTML(o); const w=window.open('','_blank'); w.document.write(html); w.document.close(); }
 function downloadPdf(id){
   const o=orders.find(x=>x.id===id); if(!o)return; const {jsPDF}=window.jspdf; const doc=new jsPDF('l','mm','a4');
   const WW=297, M=15; let y=M; const items=o.items||[]; const tgl=fd(o.createdAt);
-  doc.setFontSize(20); doc.setFont(undefined,'bold'); doc.text(STORE.name,M,y+5); doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.text(STORE.address,M,y+10); doc.text('WA: '+STORE.phone+' | '+STORE.tagline,M,y+15); doc.setFontSize(8); doc.setFont(undefined,'normal'); doc.text('© 2019 ANSTORE — Supplier Grosir HP Terpercaya',M,y+18);
-  doc.setLineWidth(0.8); doc.roundedRect(WW-M-55,y,55,22,2,2,'S'); doc.setFontSize(14); doc.setFont(undefined,'bold'); doc.text('NOTA JUAL',WW-M-27.5,y+9,{align:'center'}); doc.setFontSize(8); doc.setFont(undefined,'normal'); doc.text('Supplier Grosir HP',WW-M-27.5,y+14,{align:'center'}); doc.text('© 2019 ANSTORE',WW-M-27.5,y+18,{align:'center'}); doc.setLineWidth(0.2); y+=28; doc.line(M,y,WW-M,y); y+=8;
+  doc.setFontSize(20); doc.setFont(undefined,'bold'); doc.text(STORE.name,M,y+5); doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.text(STORE.address,M,y+10); doc.text('WA: '+STORE.phone+' | '+STORE.tagline,M,y+15);
+  doc.setLineWidth(0.8); doc.roundedRect(WW-M-55,y,55,18,2,2,'S'); doc.setFontSize(14); doc.setFont(undefined,'bold'); doc.text('NOTA JUAL',WW-M-27.5,y+11,{align:'center'}); doc.setLineWidth(0.2); y+=28; doc.line(M,y,WW-M,y); y+=8;
   doc.setFontSize(10); doc.setFont(undefined,'bold'); doc.text('No: '+o.number,M,y); doc.text('Tgl: '+tgl,M+70,y); doc.text('Pelanggan: '+o.customerName,M+130,y); doc.setFont(undefined,'normal'); y+=8; doc.setLineDashPattern([2,2],0); doc.line(M,y,WW-M,y); doc.setLineDashPattern([],0); y+=8;
   doc.setFillColor(240,240,240); doc.rect(M,y-4,WW-M*2,8,'F'); doc.setFont(undefined,'bold'); doc.setFontSize(9); doc.text('No',M+2,y); doc.text('Qty',M+20,y); doc.text('Produk',M+40,y); doc.text('Harga',WW-M-50,y,{align:'right'}); doc.text('Subtotal',WW-M-5,y,{align:'right'}); y+=6; doc.line(M,y,WW-M,y); y+=5;
   doc.setFont(undefined,'normal'); doc.setFontSize(10); items.forEach((it,i)=>{ doc.text(String(i+1),M+5,y); doc.text(String(it.qty),M+20,y); doc.text((it.name||'—').substring(0,40),M+40,y); doc.text(rp(it.price),WW-M-50,y,{align:'right'}); doc.setFont(undefined,'bold'); doc.text(rp(it.qty*it.price),WW-M-5,y,{align:'right'}); doc.setFont(undefined,'normal'); y+=7; });
   y+=3; doc.line(M,y,WW-M,y); y+=6; doc.setFont(undefined,'bold'); doc.setFontSize(12); doc.text('TOTAL: '+rp(o.total),WW-M-5,y,{align:'right'}); y+=10;
   if(o.notes){ doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.text('Catatan: '+o.notes.substring(0,80),M,y); y+=6}
   doc.setLineDashPattern([2,2],0); doc.line(M,y,WW-M,y); doc.setLineDashPattern([],0); y+=8;
-  doc.setFontSize(8); doc.text('© 2019 ANSTORE — Supplier Grosir HP — Terima kasih — '+o.customerName,WW/2,y,{align:'center'});
+  doc.setFontSize(8); doc.text(STORE.name+' © '+new Date().getFullYear()+' — Terima kasih',WW/2,y,{align:'center'});
   doc.save('Nota-'+o.number+'.pdf');
 }
 
@@ -678,17 +742,18 @@ function exportReport(fmt){
 }
 function dlCsv(cols,rows,title){ const bom='\uFEFF'; const csv=bom+cols.join(',')+'\n'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'); dl(csv,title+'.csv','text/csv') }
 function dlExcel(cols,rows,title){ const ws=XLSX.utils.aoa_to_sheet([cols,...rows]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,title); XLSX.writeFile(wb,title+'.xlsx'); }
-function dlPdf(cols,rows,title){ const {jsPDF}=window.jspdf; const doc=new jsPDF('l','mm','a4'); doc.setFontSize(12); doc.text(title+' — '+STORE.name+' © 2019 ANSTORE',14,14); doc.setFontSize(9); doc.text('Dicetak '+new Date().toLocaleDateString('id-ID'),14,20); doc.autoTable({head:[cols],body:rows,startY:26,styles:{fontSize:8},headStyles:{fillColor:[16,185,129]}}); doc.save(title+'.pdf'); }
+function dlPdf(cols,rows,title){ const {jsPDF}=window.jspdf; const doc=new jsPDF('l','mm','a4'); doc.setFontSize(12); doc.text(title+' — '+STORE.name,14,14); doc.setFontSize(9); doc.text('Dicetak '+new Date().toLocaleDateString('id-ID'),14,20); doc.autoTable({head:[cols],body:rows,startY:26,styles:{fontSize:8},headStyles:{fillColor:[16,185,129]}}); doc.save(title+'.pdf'); }
 function dl(content,filename,type){ const b=new Blob([content],{type}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
 
 // backup/restore
-function exportBackup(){ const data={customers,products,orders,shippings,payments,exportedAt:new Date().toISOString(),store:STORE.name,copyright:'© 2019 ANSTORE'}; dl(JSON.stringify(data,null,2),'anstore-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json'); toast('Backup diexport') }
+function exportBackup(){ const data={customers,products,orders,shippings,payments,exportedAt:new Date().toISOString(),store:STORE.name}; dl(JSON.stringify(data,null,2),'anstore-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json'); toast('Backup diexport') }
 function importBackup(e){
   const f=e.target.files[0]; if(!f)return;
   const r=new FileReader(); r.onload=ev=>{
     try{
       const d=JSON.parse(ev.target.result);
       if(d.customers)customers=d.customers; if(d.products)products=d.products; if(d.orders)orders=d.orders; if(d.shippings)shippings=d.shippings; if(d.payments)payments=d.payments;
+      // migrate old keys compatibility
       if(d.suppliers && !d.customers){ toast('Backup lama (mode toko) — migrasi kosong, mulai fresh'); }
       saveAll(); loadAll(); toast('Restore berhasil — '+customers.length+' toko, '+products.length+' produk, '+orders.length+' pesanan');
     }catch(err){ toast('Gagal parse JSON: '+err.message) }
